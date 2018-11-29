@@ -1,0 +1,37 @@
+{
+    "name": "hanoivip/shop",
+    "type": "library",
+	"repositories" : [
+		{
+			"type" : "path",
+			"url" : "../platform",
+			"options" : {
+					"symlink" : true
+			}
+		}, {
+			"type" : "path",
+			"url" : "../events",
+			"options" : {
+					"symlink" : true
+			}
+		}
+	],	
+    "require": {},
+	"require" : {
+		"php" : ">=7.0.0",
+		"hanoivip/platform" : "dev-master",
+		"hanoivip/events": "dev-master"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"Hanoivip\\Shop\\" : "src/"
+		}
+	},
+	"extra" : {
+		"laravel" : {
+			"providers" : [
+				"Hanoivip\\Shop\\LibServiceProvider"
+			]
+		}
+	}
+}
