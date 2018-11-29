@@ -15,4 +15,9 @@ interface IShop
      * + Được cấu hình đầy đủ
      */
     public function activePlatform();
+    /**
+     * Lấy tât cả các shop đang được cấu hình trong platform
+     * @param string $platform
+     */
+    public function shopByPlatform($platform);
 }
