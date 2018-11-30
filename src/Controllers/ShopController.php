@@ -2,13 +2,13 @@
 
 namespace Hanoivip\Shop\Controllers;
 
-use Hanoivip\Activity\Services\ShopService;
 use Hanoivip\Platform\PlatformHelper;
 use Hanoivip\Shop\Services\IShop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use Hanoivip\Shop\Services\ShopService;
 
 class ShopController extends Controller
 {
@@ -43,9 +43,11 @@ class ShopController extends Controller
         $shops = $this->shop->shopByPlatform($platform);
         $user = Auth::user();
         $userShops = [];
+        $boughts = [];
         try
         {
             $userShops = $this->shopBusiness->filterUserShops($user->getAuthIdentifier(), $shops);
+            $boughts = $this->shopBusiness->getUserBought($user->getAuthIdentifier(), $userShops);
         }
         catch (Exception $ex)
         {
@@ -56,9 +58,10 @@ class ShopController extends Controller
             
         }
         if ($request->ajax())
-            return ['userShops' => $userShops];
+            return ['platform' => $platform, 'shops' => $userShops, 'boughts' => $boughts];
         else
-            return view('hanoivip::shop-platform-detail', ['userShops' => $userShops]);
+            return view('hanoivip::shop-platform-detail', 
+                ['platform' => $platform, 'shops' => $userShops, 'boughts' => $boughts]);
     }
     
     public function buy(Request $request)
@@ -75,7 +78,13 @@ class ShopController extends Controller
                 $error = $result;
             else
             {
-                
+                if ($result)
+                {
+                    $message = __('shop.buy.success');
+                    // event?
+                }
+                else
+                    $error = __('shop.buy.fail');
             }
         }
         catch (Exception $ex)
@@ -86,5 +95,9 @@ class ShopController extends Controller
         {
             
         }
+        if ($request->ajax())
+            return ['message' => $message, 'error' => $error];
+        else
+            return view('hanoivip::shop-buy-result',  ['message' => $message, 'error' => $error]);
     }
 }
