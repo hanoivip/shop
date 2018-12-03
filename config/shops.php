@@ -22,7 +22,7 @@ return [
             'items' => [
                 'common'
             ],
-            'reset' => 0
+            'platform' => 'web',
         ],
         2 => [
             'id' => 2,
@@ -36,7 +36,7 @@ return [
             'items' => [
                 'shopvip1'
             ],
-            'reset' => 0
+            'platform' => 'web',
         ],
         3 => [
             'id' => 3,
@@ -54,7 +54,7 @@ return [
             'items' => [
                 'rare'
             ],
-            'reset' => 0
+            'platform' => 'web',
         ],
         4 => [
             'id' => 4,
@@ -76,7 +76,7 @@ return [
             'items' => [
                 'rarevip'
             ],
-            'reset' => 0
+            'platform' => 'web',
         ]
     ]
 ];

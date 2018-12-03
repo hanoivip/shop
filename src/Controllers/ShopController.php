@@ -47,7 +47,7 @@ class ShopController extends Controller
         try
         {
             $userShops = $this->shopBusiness->filterUserShops($user->getAuthIdentifier(), $shops);
-            $boughts = $this->shopBusiness->getUserBought($user->getAuthIdentifier(), $userShops);
+            $boughts = $this->shopBusiness->getUserBought($user->getAuthIdentifier(), $platform);
         }
         catch (Exception $ex)
         {
@@ -67,13 +67,14 @@ class ShopController extends Controller
     public function buy(Request $request)
     {
         $platform = $request->input('platform');
+        $shop = $request->input('shop');
         $item = $request->input('item');
         $user = Auth::user();
         $error = '';
         $message = '';
         try
         {
-            $result = $this->shopBusiness->buy($user->getAuthIdentifier(), $platform, $item);
+            $result = $this->shopBusiness->buy($user->getAuthIdentifier(), $platform, $shop, $item);
             if (gettype($result) == 'string')
                 $error = $result;
             else
@@ -89,15 +90,15 @@ class ShopController extends Controller
         }
         catch (Exception $ex)
         {
-            
+            $error = __('shop.buy.exception');
         }
         finally 
         {
             
         }
         if ($request->ajax())
-            return ['message' => $message, 'error' => $error];
+            return ['platform' => $platform, 'message' => $message, 'error' => $error];
         else
-            return view('hanoivip::shop-buy-result',  ['message' => $message, 'error' => $error]);
+            return view('hanoivip::shop-buy-result',  ['platform' => $platform, 'message' => $message, 'error' => $error]);
     }
 }

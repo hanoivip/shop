@@ -5,6 +5,7 @@
  */
 
 // Configure Items in each Shop
+// DailyLimit??
 return [
     'common' => [
         'CommonItem1' => [
@@ -34,7 +35,8 @@ return [
             'id' => 'rareitemid1',
             'price' => 10,
             'price_type' => 'xu',
-            'count' => 5
+            'count' => 5,
+            'daily_limit' => 1,
         ],
     ],
 ];

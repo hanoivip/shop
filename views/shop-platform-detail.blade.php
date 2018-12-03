@@ -16,16 +16,9 @@
 			<form method="post" action="{{route('shop.buy')}}">
 				csrf_token()
 				Tên: {{ $item->name }}, Giá: {{ $item->price }}, Số lượng: {{ $item->count }}
-				@if (isset($boughts[$item->id]) && !empty($shop->reset))
-					Thời gian miễn phí kế tiếp: {{ display_wait_time($boughts[$item->id]->last_buy_time, $shop->reset) }}
-				@endif
 				<input type="hidden" id="platform" name="platform" value="{{$platform}}"/>
 				<input type="hidden" id="item" name="item" value="{{$item->id}}"/>
-				@if (!isset($boughts[$item->id]) && !empty($shop->reset))
-					<button type="submit">Miễn phí</button>
-				@else
-					<button type="submit">Mua</button>
-				@endif
+				<button type="submit">Mua</button>
 			</form>
 			<br/>
 		@endforeach
