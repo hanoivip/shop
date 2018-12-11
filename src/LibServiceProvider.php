@@ -33,5 +33,8 @@ class LibServiceProvider extends ServiceProvider
         {
             $this->app->bind(IShop::class, DatabaseShop::class);
         }
+        $this->mergeConfigFrom(__DIR__.'/../config/shop.php', 'shop');
+        $this->mergeConfigFrom(__DIR__.'/../config/shops.php', 'shops');
+        $this->mergeConfigFrom(__DIR__.'/../config/shopItems.php', 'shopItems');
     }
 }

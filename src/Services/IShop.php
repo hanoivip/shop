@@ -26,15 +26,15 @@ interface IShop
      */
     public function shopByPlatform($platform);
     /**
-     * 
+     * All items in a shop
      * @param number $shop Shop ID
      * @return ShopItem[]
      */
     public function itemByShop($shop);
     /**
-     * 
+     * Get platform config
      * @param string $name
-     * @param array Associate array of Shop
+     * @return array
      */
     public function getPlatform($name);
 }

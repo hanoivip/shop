@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 // User Domain
-Route::middleware(['web', 'auth:web'])->namespace('Hanoivip\Activity\Controllers')->prefix('user')->group(function () {
+Route::middleware(['web', 'auth:web'])->namespace('Hanoivip\Shop\Controllers')->prefix('user')->group(function () {
     Route::get('/shop', function () {
         return redirect()->route('shop.platform');
     })->name('shop');
@@ -14,6 +14,6 @@ Route::middleware(['web', 'auth:web'])->namespace('Hanoivip\Activity\Controllers
     Route::post('/shop/group/buy', 'ShopController@buy')->name('shop.buy');
 });
 // Admin Domain
-Route::middleware(['web', 'admin'])->namespace('Hanoivip\Activity\Controllers')->prefix('ecmin')->group(function () {
+Route::middleware(['web', 'admin'])->namespace('Hanoivip\Shop\Controllers')->prefix('ecmin')->group(function () {
 
 });

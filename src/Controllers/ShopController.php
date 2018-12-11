@@ -28,6 +28,27 @@ class ShopController extends Controller
         $this->shopBusiness = $shopBusiness;
     }
     
+    private function objectToArray($d) {
+        if (is_object($d)) {
+            // Gets the properties of the given object
+            // with get_object_vars function
+            $d = get_object_vars($d);
+        }
+        
+        if (is_array($d)) {
+            /*
+             * Return array converted to object
+             * Using __FUNCTION__ (Magic constant)
+             * for recursive call
+             */
+            return array_map(__FUNCTION__, $d);
+        }
+        else {
+            // Return array
+            return $d;
+        }
+    }
+    
     public function listPlatform(Request $request)
     {
         $platforms = $this->shop->activePlatform();
@@ -74,7 +95,7 @@ class ShopController extends Controller
         $message = '';
         try
         {
-            $result = $this->shopBusiness->buy($user->getAuthIdentifier(), $platform, $shop, $item);
+            $result = $this->shopBusiness->buy($user, $platform, $shop, $item);
             if (gettype($result) == 'string')
                 $error = $result;
             else
