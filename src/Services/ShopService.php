@@ -102,16 +102,17 @@ class ShopService
         $uid = $user->getAuthIdentifier();
         $shops = $this->shop->shopByPlatform($platform);
         if (!isset($shops[$shop]))
-            return __('shop.not-exists');
+            return __('hanoivip::shop.not-exists');
         $shopCfg = $shops[$shop];
-        $items = $this->shop->itemByShop($shop);
+        Log::debug('.....' . print_r($shopCfg, true));
+        $items = $shopCfg['items'];
         if (!isset($items[$item]))
-            return __('shop.item.not-exists');
+            return __('hanoivip::shop.item-not-exists');
         $itemCfg = $items[$item];
         // Check price
         $price = $itemCfg['price'];
         if (!$this->balance->enough($uid, $price))
-            return __('shop.not-enough-coin');
+            return __('hanoivip::shop.not-enough-coin');
         // Charge User
         $this->balance->remove($uid, $price, "Shop:{$shop}:{$item}");
         // Add item to platform
@@ -130,9 +131,11 @@ class ShopService
      */
     public function getUserBought($uid, $platform)
     {
+        return [];
+        /*
         $tmp = new UserShop();
-        $tablename = $this->shop->getPlatform($platform);
-        $tmp->setTable($tablename);
+        $cfg = $this->shop->getPlatform($platform);
+        $tmp->setTable($cfg['table']);
         $builder = $tmp->newQuery();
         $all = $builder
                     ->where('user_id', $uid)
@@ -145,7 +148,7 @@ class ShopService
                 $boughts[$shop] = [];
             $boughts[$shop][$record->item_id] = $record;
         }
-        return $boughts;
+        return $boughts;*/
     }
     
     

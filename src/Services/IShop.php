@@ -27,7 +27,7 @@ interface IShop
     public function shopByPlatform($platform);
     /**
      * All items in a shop
-     * @param number $shop Shop ID
+     * @param array $shop Shop Cfg Array
      * @return ShopItem[]
      */
     public function itemByShop($shop);

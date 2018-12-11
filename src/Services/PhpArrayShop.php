@@ -18,6 +18,12 @@ class PhpArrayShop implements IShop
     public function shopByPlatform($platform)
     {
         $shops = config('shops.' . $platform, []);
+        foreach ($shops as $sid => $shop)
+        {
+            $items = $this->itemByShop($shop);
+            unset($shops[$sid]['items']);
+            $shops[$sid]['items'] = $items;
+        }
         return $shops;
         // convert to Shop models
         $models = [];
@@ -57,18 +63,9 @@ class PhpArrayShop implements IShop
         {
             $newItems = config('shopItems.' . $group, []);
             if (!empty($newItems))
-                array_push($items, $newItems);
+                $items = array_merge($items, $newItems);
         }
         return $items;
-        // convert to models
-        $models = [];
-        foreach ($items as $item)
-        {
-            $i = new ShopItem();
-            $i->fill($item);
-            $models[] = $i;
-        }
-        return $models;
     }
 
 

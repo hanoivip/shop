@@ -2,6 +2,7 @@
 
 namespace Hanoivip\Shop\Controllers;
 
+use Hanoivip\PaymentClient\BalanceUtil;
 use Hanoivip\Platform\PlatformHelper;
 use Hanoivip\Shop\Services\IShop;
 use Illuminate\Http\Request;
@@ -18,35 +19,18 @@ class ShopController extends Controller
     
     protected $shopBusiness;
     
+    protected $balance;
+    
     public function __construct(
         IShop $shop,
         PlatformHelper $helper,
-        ShopService $shopBusiness)
+        ShopService $shopBusiness,
+        BalanceUtil $balance)
     {
         $this->shop = $shop;
         $this->helper = $helper;
         $this->shopBusiness = $shopBusiness;
-    }
-    
-    private function objectToArray($d) {
-        if (is_object($d)) {
-            // Gets the properties of the given object
-            // with get_object_vars function
-            $d = get_object_vars($d);
-        }
-        
-        if (is_array($d)) {
-            /*
-             * Return array converted to object
-             * Using __FUNCTION__ (Magic constant)
-             * for recursive call
-             */
-            return array_map(__FUNCTION__, $d);
-        }
-        else {
-            // Return array
-            return $d;
-        }
+        $this->balance = $balance;
     }
     
     public function listPlatform(Request $request)
@@ -65,6 +49,7 @@ class ShopController extends Controller
         $user = Auth::user();
         $userShops = [];
         $boughts = [];
+        $info = $this->balance->getInfo($user->getAuthIdentifier());
         try
         {
             $userShops = $this->shopBusiness->filterUserShops($user->getAuthIdentifier(), $shops);
@@ -76,13 +61,12 @@ class ShopController extends Controller
         }
         finally 
         {
-            
         }
         if ($request->ajax())
             return ['platform' => $platform, 'shops' => $userShops, 'boughts' => $boughts];
         else
             return view('hanoivip::shop-platform-detail', 
-                ['platform' => $platform, 'shops' => $userShops, 'boughts' => $boughts]);
+                ['platform' => $platform, 'shops' => $userShops, 'boughts' => $boughts, 'balance' => $info]);
     }
     
     public function buy(Request $request)
@@ -102,20 +86,20 @@ class ShopController extends Controller
             {
                 if ($result)
                 {
-                    $message = __('shop.buy.success');
+                    $message = __('hanoivip::shop.success');
                     // event?
                 }
                 else
-                    $error = __('shop.buy.fail');
+                    $error = __('hanoivip::shop.fail');
             }
         }
         catch (Exception $ex)
         {
-            $error = __('shop.buy.exception');
+            $error = __('hanoivip::shop.exception');
+            Log::error('Shop buy item exception. Ex:' . $ex->getMessage());
         }
         finally 
         {
-            
         }
         if ($request->ajax())
             return ['platform' => $platform, 'message' => $message, 'error' => $error];
