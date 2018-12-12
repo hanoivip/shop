@@ -7,4 +7,6 @@ return [
     'not-exists' => 'Shop không tồn tại',
     'item-not-exists' => 'Vật phẩm không tồn tại',
     'not-enough-coin' => 'Không đủ xu trong tài khoản. Mời nạp thêm.',
+    'time-out' => 'Quá hạn mua vật phẩm. Mời thực hiện lại',
+    'send-item-fail' => 'Mua vật phẩm không thành công (gửi vật phẩm lỗi). Mời thử lại trước khi liên hệ hỗ trợ.'
 ];

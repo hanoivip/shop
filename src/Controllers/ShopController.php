@@ -2,11 +2,13 @@
 
 namespace Hanoivip\Shop\Controllers;
 
+use Carbon\Carbon;
 use Hanoivip\PaymentClient\BalanceUtil;
 use Hanoivip\Platform\PlatformHelper;
 use Hanoivip\Shop\Services\IShop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Exception;
 use Hanoivip\Shop\Services\ShopService;
@@ -53,9 +55,9 @@ class ShopController extends Controller
         try
         {
             $info = $this->balance->getInfo($user->getAuthIdentifier());
-            $platformObj = $this->helper->getPlatform($platform);
-            $roles = $platformObj->getInfos($user);
-            Log::debug('SHop query roles..' . print_r($roles, true));
+            //$platformObj = $this->helper->getPlatform($platform);
+            // $roles = $platformObj->getInfos($user);
+            // Log::debug('SHop query roles..' . print_r($roles, true));
             $userShops = $this->shopBusiness->filterUserShops($user->getAuthIdentifier(), $shops);
             $boughts = $this->shopBusiness->getUserBought($user->getAuthIdentifier(), $platform);
         }
@@ -80,15 +82,74 @@ class ShopController extends Controller
         $platform = $request->input('platform');
         $shop = $request->input('shop');
         $item = $request->input('item');
-        $role = $request->input('role');
         $user = Auth::user();
         $error = '';
         $message = '';
         try
         {
-            $result = $this->shopBusiness->buy($user, $platform, $shop, $item);
+            $platformObj = $this->helper->getPlatform($platform);
+            $roles = $platformObj->getInfos($user);
+            if (!empty($roles))
+            {
+                // Save Cache
+                Cache::put('ShopBuy' . $user->getAuthIdentifier(), 
+                    ['shop' => $shop, 'item' => $item],
+                    Carbon::now()->addMinutes(5));
+                return view('hanoivip::shop-buy-confirm', ['platform' => $platform, 'roles' => $roles, 'item' => $item]);
+            }
+            else 
+            {
+                $result = $this->shopBusiness->buy($user, $platform, $shop, $item);
+                if (gettype($result) == 'string')
+                {
+                    $error = $result;
+                }
+                else
+                {
+                    if ($result)
+                    {
+                        $message = __('hanoivip::shop.success');
+                        // event?
+                    }
+                    else
+                        $error = __('hanoivip::shop.fail');
+                }
+            }
+            
+        }
+        catch (Exception $ex)
+        {
+            $error = __('hanoivip::shop.exception');
+            Log::error('Shop buy item exception. Ex:' . $ex->getMessage());
+        }
+        finally 
+        {
+        }
+        if ($request->ajax())
+            return ['platform' => $platform, 'message' => $message, 'error' => $error];
+        else
+            return view('hanoivip::shop-buy-result',  ['platform' => $platform, 'message' => $message, 'error' => $error]);
+    }
+    
+    public function buyConfirm(Request $request)
+    {
+        $role = $request->input('role');
+        $platform = $request->input('platform');
+        $user = Auth::user();
+        if (!Cache::has('ShopBuy' . $user->getAuthIdentifier()))
+            return view('hanoivip::shop-buy-result',  ['platform' => $platform, 'error' => __('hanoivip::shop.time-out')]);
+        $posted = Cache::get('ShopBuy' . $user->getAuthIdentifier());
+        $shop = $posted['shop'];
+        $item = $posted['item'];
+        $error = '';
+        $message = '';
+        try 
+        {
+            $result = $this->shopBusiness->buy($user, $platform, $shop, $item, $role);
             if (gettype($result) == 'string')
+            {
                 $error = $result;
+            }
             else
             {
                 if ($result)
@@ -99,11 +160,11 @@ class ShopController extends Controller
                 else
                     $error = __('hanoivip::shop.fail');
             }
-        }
-        catch (Exception $ex)
+        } 
+        catch (Exception $ex) 
         {
             $error = __('hanoivip::shop.exception');
-            Log::error('Shop buy item exception. Ex:' . $ex->getMessage());
+            Log::error('Shop buy confirm item exception. Ex:' . $ex->getMessage());
         }
         finally 
         {
