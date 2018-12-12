@@ -49,9 +49,13 @@ class ShopController extends Controller
         $user = Auth::user();
         $userShops = [];
         $boughts = [];
-        $info = $this->balance->getInfo($user->getAuthIdentifier());
+        $roles = [];
         try
         {
+            $info = $this->balance->getInfo($user->getAuthIdentifier());
+            $platformObj = $this->helper->getPlatform($platform);
+            $roles = $platformObj->getInfos($user);
+            Log::debug('SHop query roles..' . print_r($roles, true));
             $userShops = $this->shopBusiness->filterUserShops($user->getAuthIdentifier(), $shops);
             $boughts = $this->shopBusiness->getUserBought($user->getAuthIdentifier(), $platform);
         }
@@ -63,10 +67,12 @@ class ShopController extends Controller
         {
         }
         if ($request->ajax())
-            return ['platform' => $platform, 'shops' => $userShops, 'boughts' => $boughts];
+            return ['platform' => $platform, 'shops' => $userShops, 'boughts' => $boughts,
+                    'balance' => $info, 'roles' => $roles];
         else
             return view('hanoivip::shop-platform-detail', 
-                ['platform' => $platform, 'shops' => $userShops, 'boughts' => $boughts, 'balance' => $info]);
+                ['platform' => $platform, 'shops' => $userShops, 'boughts' => $boughts, 
+                    'balance' => $info, 'roles' => $roles]);
     }
     
     public function buy(Request $request)
@@ -74,6 +80,7 @@ class ShopController extends Controller
         $platform = $request->input('platform');
         $shop = $request->input('shop');
         $item = $request->input('item');
+        $role = $request->input('role');
         $user = Auth::user();
         $error = '';
         $message = '';

@@ -14,6 +14,15 @@
 	<p>Chưa có xu nào trong tk!</p>
 @endif
 
+@if (!empty($roles))
+Chọn nhân vật:
+	<select id='role' name='role'>
+	@foreach ($roles as $roleId => $roleName)
+		<option value="{{$roleId}}">{{$roleName}}</option>
+	@endforeach
+	</select>
+@endif
+
 @if (!empty($shops))
 	<p>Long: sử dụng các tabs control để phân chia các shop</p>
 	@foreach ($shops as $shop)

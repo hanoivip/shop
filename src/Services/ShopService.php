@@ -104,7 +104,6 @@ class ShopService
         if (!isset($shops[$shop]))
             return __('hanoivip::shop.not-exists');
         $shopCfg = $shops[$shop];
-        Log::debug('.....' . print_r($shopCfg, true));
         $items = $shopCfg['items'];
         if (!isset($items[$item]))
             return __('hanoivip::shop.item-not-exists');
@@ -113,11 +112,12 @@ class ShopService
         $price = $itemCfg['price'];
         if (!$this->balance->enough($uid, $price))
             return __('hanoivip::shop.not-enough-coin');
-        // Charge User
-        $this->balance->remove($uid, $price, "Shop:{$shop}:{$item}");
         // Add item to platform
         $platformObj = $this->helper->getPlatform($platform);
-        $platformObj->sendItem($user, $itemCfg['id'], $itemCfg['count'], $role);
+        if (!$platformObj->sendItem($user, $itemCfg['id'], $itemCfg['count'], $role))
+            return __('hanoivip::shop.send-item-fail');
+        // Charge User
+        $this->balance->remove($uid, $price, "Shop:{$shop}:{$item}");
         // Save log
         return true;
     }
