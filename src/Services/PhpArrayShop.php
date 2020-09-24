@@ -2,7 +2,6 @@
 
 namespace Hanoivip\Shop\Services;
 
-use Hanoivip\Platform\PlatformHelper;
 use Hanoivip\Shop\Models\Shop;
 use Hanoivip\Shop\Models\ShopItem;
 

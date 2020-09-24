@@ -1,177 +1,115 @@
 <?php
-
 namespace Hanoivip\Shop\Controllers;
 
-use Carbon\Carbon;
-use Hanoivip\PaymentClient\BalanceUtil;
-use Hanoivip\Platform\PlatformHelper;
 use Hanoivip\Shop\Services\IShop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
-use Exception;
 use Hanoivip\Shop\Services\ShopService;
 
 class ShopController extends Controller
 {
+
     protected $shop;
-    
-    protected $helper;
-    
+
     protected $shopBusiness;
-    
-    protected $balance;
-    
-    public function __construct(
-        IShop $shop,
-        PlatformHelper $helper,
-        ShopService $shopBusiness,
-        BalanceUtil $balance)
+
+    public function __construct(IShop $shop, ShopService $shopBusiness)
     {
         $this->shop = $shop;
-        $this->helper = $helper;
         $this->shopBusiness = $shopBusiness;
-        $this->balance = $balance;
     }
-    
-    public function listPlatform(Request $request)
+
+    /**
+     * List all player's shop
+     * And shop items
+     *
+     * @param Request $request
+     */
+    public function listShop(Request $request)
     {
-        $platforms = $this->shop->activePlatform();
-        if ($request->ajax())
-            return ['platforms' => $platforms];
-        else
-            return view('hanoivip::shop-platforms', ['platforms' => $platforms]);
+        $uid = Auth::user()->getAuthIdentifier();
+        $shops = $this->shopBusiness->filterUserShops($uid);
+        $shop = $this->shopBusiness->getDefaultShop();
+        if ($request->has('shop'))
+            $shop = $request->input('shop');
+        $shopItems = [];
+        if (! empty($shop)) {
+            $shopItems = $this->shopBusiness->getShopItems($shop);
+        }
+        return view('shop-list', [
+            'shops' => $shops,
+            'shop' => $shop,
+            'shop_items' => $shopItems
+        ]);
     }
-    
-    public function detailPlatform(Request $request)
+
+    public function confirm(Request $request)
     {
-        $platform = $request->input('platform');
-        $shops = $this->shop->shopByPlatform($platform);
-        $user = Auth::user();
-        $userShops = [];
-        $boughts = [];
-        $roles = [];
-        try
-        {
-            $info = $this->balance->getInfo($user->getAuthIdentifier());
-            //$platformObj = $this->helper->getPlatform($platform);
-            // $roles = $platformObj->getInfos($user);
-            // Log::debug('SHop query roles..' . print_r($roles, true));
-            $userShops = $this->shopBusiness->filterUserShops($user->getAuthIdentifier(), $shops);
-            $boughts = $this->shopBusiness->getUserBought($user->getAuthIdentifier(), $platform);
-        }
-        catch (Exception $ex)
-        {
-            Log::error('Shop get platform shop detail error. Ex:' . $ex->getMessage());
-        }
-        finally 
-        {
-        }
-        if ($request->ajax())
-            return ['platform' => $platform, 'shops' => $userShops, 'boughts' => $boughts,
-                    'balance' => $info, 'roles' => $roles];
-        else
-            return view('hanoivip::shop-platform-detail', 
-                ['platform' => $platform, 'shops' => $userShops, 'boughts' => $boughts, 
-                    'balance' => $info, 'roles' => $roles]);
-    }
-    
-    public function buy(Request $request)
-    {
-        $platform = $request->input('platform');
+        $server = $request->input('server');
+        $role = $request->input('role');
         $shop = $request->input('shop');
         $item = $request->input('item');
-        $user = Auth::user();
-        $error = '';
-        $message = '';
-        try
-        {
-            $platformObj = $this->helper->getPlatform($platform);
-            $roles = $platformObj->getInfos($user);
-            if (!empty($roles))
-            {
-                // Save Cache
-                Cache::put('ShopBuy' . $user->getAuthIdentifier(), 
-                    ['shop' => $shop, 'item' => $item],
-                    Carbon::now()->addMinutes(5));
-                return view('hanoivip::shop-buy-confirm', ['platform' => $platform, 'roles' => $roles, 'item' => $item]);
-            }
-            else 
-            {
-                $result = $this->shopBusiness->buy($user, $platform, $shop, $item);
-                if (gettype($result) == 'string')
-                {
-                    $error = $result;
-                }
-                else
-                {
-                    if ($result)
-                    {
-                        $message = __('hanoivip::shop.success');
-                        // event?
-                    }
-                    else
-                        $error = __('hanoivip::shop.fail');
-                }
-            }
-            
-        }
-        catch (Exception $ex)
-        {
-            $error = __('hanoivip::shop.exception');
-            Log::error('Shop buy item exception. Ex:' . $ex->getMessage());
-        }
-        finally 
-        {
-        }
-        if ($request->ajax())
-            return ['platform' => $platform, 'message' => $message, 'error' => $error];
-        else
-            return view('hanoivip::shop-buy-result',  ['platform' => $platform, 'message' => $message, 'error' => $error]);
+        $count = $request->input('count');
+        // item detail
+        $itemDetail = $this->shopBusiness->getShopItems($shop, $item);
+        // caculate final price
+        $price = $this->shopBusiness->caculatePrice($shop, $item, $count);
+        // include sale..
+        return view('shop-item-confirm', [
+            'server' => $server,
+            'role' => $role,
+            'item_detail' => $itemDetail,
+            'price' => $price
+        ]);
     }
-    
-    public function buyConfirm(Request $request)
+
+    public function order(Request $request)
     {
+        $server = $request->input('server');
         $role = $request->input('role');
-        $platform = $request->input('platform');
-        $user = Auth::user();
-        if (!Cache::has('ShopBuy' . $user->getAuthIdentifier()))
-            return view('hanoivip::shop-buy-result',  ['platform' => $platform, 'error' => __('hanoivip::shop.time-out')]);
-        $posted = Cache::get('ShopBuy' . $user->getAuthIdentifier());
-        $shop = $posted['shop'];
-        $item = $posted['item'];
-        $error = '';
-        $message = '';
-        try 
-        {
-            $result = $this->shopBusiness->buy($user, $platform, $shop, $item, $role);
-            if (gettype($result) == 'string')
-            {
-                $error = $result;
-            }
-            else
-            {
-                if ($result)
-                {
-                    $message = __('hanoivip::shop.success');
-                    // event?
-                }
-                else
-                    $error = __('hanoivip::shop.fail');
-            }
-        } 
-        catch (Exception $ex) 
-        {
-            $error = __('hanoivip::shop.exception');
-            Log::error('Shop buy confirm item exception. Ex:' . $ex->getMessage());
+        $shop = $request->input('shop');
+        $item = $request->input('item');
+        $count = $request->input('count');
+        $receiver = Auth::user()->getAuthIdentifier();
+        // create order
+        $order = $this->shopBusiness->order($receiver, $server, $role, $shop, $item, $count);
+        // redirect to pay order
+        if ($order !== false) {
+            return redirect()->route('shop.pay', [
+                'order' => $order->serial
+            ]);
+        } else {
+            return view('shop-order-fail');
         }
-        finally 
+    }
+
+    /**
+     * User pay for order
+     *
+     * @param Request $request
+     */
+    public function pay(Request $request)
+    {
+        $serial = $request->input('order');
+        $payer = Auth::user()->getAuthIdentifier();
+        $result = $this->shopBusiness->pay($payer, $serial);
+        if ($result === true)
         {
+            return redirect()->route('shop.success');
         }
-        if ($request->ajax())
-            return ['platform' => $platform, 'message' => $message, 'error' => $error];
         else
-            return view('hanoivip::shop-buy-result',  ['platform' => $platform, 'message' => $message, 'error' => $error]);
+        {
+            return view('shop-pay-fail');
+        }
+    }
+
+    /**
+     * User paid, open success page
+     *
+     * @param Request $request
+     */
+    public function paySuccess(Request $request)
+    {
+        return view('shop-pay-success');
     }
 }

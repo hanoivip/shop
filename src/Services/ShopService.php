@@ -4,27 +4,16 @@ namespace Hanoivip\Shop\Services;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
-use Hanoivip\Shop\Models\UserShop;
-use Hanoivip\PaymentClient\BalanceUtil;
-use Hanoivip\Platform\PlatformHelper;
-use Illuminate\Auth\Authenticatable;
+use Hanoivip\Vip\Facades\VipFacade;
 
 class ShopService
 {
-    private $shop;
-    
-    private $balance;
-    
-    private $helper;
+    private $shopData;
     
     public function __construct(
-        IShop $shop,
-        BalanceUtil $balance,
-        PlatformHelper $helper)
+        IShopData $shopData)
     {
-        $this->shop = $shop;   
-        $this->balance = $balance;
-        $this->helper = $helper;
+        $this->shopData = $shopData;   
     }
     
     /**
@@ -36,20 +25,23 @@ class ShopService
      * + Điểm bất kỳ nào đó ..
      * 
      * @param number $uid
-     * @param array $shopCfgs Array of array of configurations
+     * @return \stdClass[] Array of shop config
      */
-    public function filterUserShops($uid, $shopCfgs)
+    public function filterUserShops($uid)
     {
+        $shopCfgs = $this->shopData->all();
         $filtered = [];
         foreach ($shopCfgs as $cfg)
         {
             $unlock = true;
-            $conditions = $cfg['unlock'];
+            $conditions = $cfg->unlock;//['unlock']; very trouble some. 
+            // need auto convert string to array if database source
+            // https://stackoverflow.com/questions/53386990/convert-only-one-column-from-string-to-array-in-laravel-5
             foreach ($conditions as $cond)
             {
-                $type = $cond['type'];
-                $value = $cond['value'];
-                $id = $cond['id'];
+                $type = $cond->type;//['type'];i donot want to waste my time
+                $value = $cond->value;//['value'];it is too strictly
+                //$id = $cond['id'];
                 switch ($type)
                 {
                     case 'VipLevel':
@@ -73,7 +65,7 @@ class ShopService
     
     private function checkVipLevel($uid, $level)
     {
-        return true;
+        return VipFacade::getInfo($uid)->level >= $level;
     }
     
     private function checkAfterTime($time)
@@ -84,6 +76,32 @@ class ShopService
     private function checkBeforeTime($time)
     {
         return Carbon::now()->timestamp < $time;
+    }
+    
+    public function getDefaultShop()
+    {
+        return config('shop.default', '');
+    }
+    /**
+     * 
+     * @param string $shop Shop code/name
+     * @param array|string $items Item code or Array of item codes
+     * @return \stdClass[]
+     */
+    public function getShopItems($shop, $items = [])
+    {
+        
+    }
+    /**
+     * 
+     * @param string $shop
+     * @param \stdClass|string $item Item object or item code
+     * @param number $count
+     * @return \stdClass Price object: price, origin_price
+     */
+    public function caculatePrice($shop, $item, $count)
+    {
+        
     }
     
     /**
@@ -122,34 +140,6 @@ class ShopService
         return true;
     }
     
-    /**
-     * Lấy về trạng thái đã mua 1 món đồ
-     * 
-     * @param number $uid
-     * @param string $platform
-     * @return array array (shop id => array(item id => UserShop))
-     */
-    public function getUserBought($uid, $platform)
-    {
-        return [];
-        /*
-        $tmp = new UserShop();
-        $cfg = $this->shop->getPlatform($platform);
-        $tmp->setTable($cfg['table']);
-        $builder = $tmp->newQuery();
-        $all = $builder
-                    ->where('user_id', $uid)
-                    ->get();
-        $boughts = [];
-        foreach ($all as $record)
-        {
-            $shop = $record->shop_id;
-            if (!isset($boughts[$shop]))
-                $boughts[$shop] = [];
-            $boughts[$shop][$record->item_id] = $record;
-        }
-        return $boughts;*/
-    }
     
     
 }

@@ -14,69 +14,65 @@
 
 // Configure Shop Detail
 return [
-    'web' => [
-        1 => [
-            'id' => 1,
-            'name' => 'Normal Web Shop',
-            'unlock' => [],
-            'items' => [
-                'common'
-            ],
-            'platform' => 'web',
+    1 => [
+        'id' => 1,
+        'name' => 'Normal Web Shop',
+        'unlock' => [],
+        'items' => [
+            'common'
         ],
-        2 => [
-            'id' => 2,
-            'name' => 'Vip Shop',
-            'unlock' => [
-                [
-                    'type' => 'VipLevel',
-                    'value' => 1,
-                ]
-            ],
-            'items' => [
-                'shopvip1'
-            ],
-            'platform' => 'web',
+    ],
+    2 => [
+        'id' => 2,
+        'name' => 'Vip Shop',
+        'unlock' => [
+            [
+                'type' => 'VipLevel',
+                'value' => 1,
+            ]
         ],
-        3 => [
-            'id' => 3,
-            'name' => 'Rare Shop',
-            'unlock' => [
-                [
-                    'type' => 'AfterTime',
-                    'value' => 9999999,
-                ],
-                [
-                    'type' => 'BeforeTime',
-                    'value' => 0,
-                ],
-            ],
-            'items' => [
-                'rare'
-            ],
-            'platform' => 'web',
+        'items' => [
+            'shopvip1'
         ],
-        4 => [
-            'id' => 4,
-            'name' => 'Rare Shop Vip',
-            'unlock' => [
-                [
-                    'type' => 'AfterTime',
-                    'value' => 9999999,
-                ],
-                [
-                    'type' => 'BeforeTime',
-                    'value' => 0,
-                ],
-                [
-                    'type' => 'VipLevel',
-                    'value' => 3,
-                ]
+    ],
+    3 => [
+        'id' => 3,
+        'name' => 'Rare Shop',
+        'unlock' => [
+            [
+                'type' => 'AfterTime',
+                'value' => 9999999,
             ],
-            'items' => [
-                'rarevip'
+            [
+                'type' => 'BeforeTime',
+                'value' => 0,
             ],
-            'platform' => 'web',
-        ]
+        ],
+        'items' => [
+            'rare'
+        ],
+        'start_time' => '2020-09-18 00:00:00', 
+        'end_time' => '2020-10-18 00:00:00',
+    ],
+    4 => [
+        'id' => 4,
+        'name' => 'Rare Shop Vip',
+        'unlock' => [
+            [
+                'type' => 'AfterTime',
+                'value' => 9999999,
+            ],
+            [
+                'type' => 'BeforeTime',
+                'value' => 0,
+            ],
+            [
+                'type' => 'VipLevel',
+                'value' => 3,
+            ]
+        ],
+        'items' => [
+            'rarevip'
+        ],
     ]
 ];

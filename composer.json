@@ -4,12 +4,6 @@
 	"repositories" : [
 		{
 			"type" : "path",
-			"url" : "../platform",
-			"options" : {
-					"symlink" : true
-			}
-		}, {
-			"type" : "path",
 			"url" : "../events",
 			"options" : {
 					"symlink" : true
@@ -18,7 +12,6 @@
 	],	
 	"require" : {
 		"php" : ">=7.0.0",
-		"hanoivip/platform" : "dev-master",
 		"hanoivip/events": "dev-master"
 	},
 	"autoload" : {
