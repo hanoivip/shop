@@ -132,6 +132,7 @@ class ShopService
      */
     public function order($receiver, $server, $role, $shop, $item, $count)
     {
+        // Check limit???
         $price = $this->caculatePrice($shop, $item, $count);
         $order = new ShopOrder();
         $order->serial = str_random(8);
@@ -175,4 +176,8 @@ class ShopService
         return true;
     }
     
+    public function listOrder($userId)
+    {
+        return [];
+    }
 }

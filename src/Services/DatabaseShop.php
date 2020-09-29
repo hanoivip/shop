@@ -17,7 +17,9 @@ class DatabaseShop implements IShopData
     {
         if (empty($items))
         {
-            $ret = ShopItem::where('shop_id', $shop)->get();
+            // all() : array of eloquent object
+            // toArray(): array of array
+            $ret = ShopItem::where('shop_id', $shop)->all();
             return $ret;
         }
         else if (gettype($items) == 'array')
@@ -26,7 +28,7 @@ class DatabaseShop implements IShopData
         }
         else
         {
-            
+            return ShopItem::where('shop_id', $shop)->where('code', $items)->first();
         }
     }
     

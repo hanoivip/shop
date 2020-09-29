@@ -38,6 +38,20 @@ class ShopController extends Controller
             'shop_items' => $shopItems
         ]);
     }
+    
+    public function roleHelper(Request $request)
+    {
+        $shop = $request->input('shop');
+        $item = $request->input('item');
+        $count = $request->input('count');
+        // open role wizard
+        return redirect()->route('wizard.role', [
+            'shop' => $shop,
+            'item' => $item,
+            'count' => $count,
+            'next' => 'shop.confirm'
+        ]);
+    }
 
     public function confirm(Request $request)
     {
@@ -49,12 +63,13 @@ class ShopController extends Controller
         // item detail
         $itemDetail = $this->shopBusiness->getShopItems($shop, $item);
         // caculate final price
-        $price = $this->shopBusiness->caculatePrice($shop, $item, $count);
+        $price = $this->shopBusiness->caculatePrice($shop, $itemDetail, $count);
         // include sale..
         return view('shop-item-confirm', [
             'server' => $server,
             'role' => $role,
             'item_detail' => $itemDetail,
+            'count' => $count,
             'price' => $price
         ]);
     }
@@ -107,5 +122,12 @@ class ShopController extends Controller
     public function paySuccess(Request $request)
     {
         return view('shop-pay-success');
+    }
+    
+    public function listOrder(Request $request)
+    {
+        $uid = Auth::user()->getAuthIdentifier();
+        $orders = $this->shopBusiness->listOrder($uid);
+        return view('shop-order-list', ['orders' => $orders]);
     }
 }

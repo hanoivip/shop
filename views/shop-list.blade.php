@@ -25,11 +25,14 @@
 @foreach ($shop_items as $item)
 	<li>
 		<div>
-			<form method="post" action="{{route('')}}">
+			<form method="post" action="{{route('shop.helper')}}">
 			{{ csrf_field() }}
 			Name: {{$item->title}} </br>
 			Origin price: {{$item->origin_price}} </br>
 			Price: {{$item->price}}
+			<input type="hidden" name="shop" value="{{$current}}"/>
+			<input type="hidden" name="item" value="{{$item->code}}"/>
+			<input type="hidden" name="count" value="1"/>
 			<img src="{{$item->image}}"/>
 			<button type="submit">Buy</button>
 			</form>
