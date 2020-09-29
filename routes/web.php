@@ -9,7 +9,7 @@ Route::middleware([
     ->group(function () {
     // Liệt kê các shop của người chơi = home of module
     Route::get('/shop', 'ShopController@list')->name('shop');
-    // Chọn vật phẩm, sv, nhân vật; hiển thị hóa đơn, html ui
+    // Chọn vật phẩm, sv, nhân vật; hiển thị hóa đơn, html ui == preview order
     Route::get('/shop/confirm', 'ShopController@confirm')->name('shop.confirm');
     // Tạo hóa đơn
     Route::post('/shop/order', 'ShopController@order')->name('shop.order');

@@ -4,7 +4,7 @@ namespace Hanoivip\Shop;
 
 use Illuminate\Support\ServiceProvider;
 use Hanoivip\Shop\Services\DatabaseShop;
-use Hanoivip\Shop\Services\IShop;
+use Hanoivip\Shop\Services\IShopData;
 use Hanoivip\Shop\Services\PhpArrayShop;
 
 class LibServiceProvider extends ServiceProvider
@@ -27,11 +27,11 @@ class LibServiceProvider extends ServiceProvider
     {
         if (config('shop.cfg') == 'array')
         {
-            $this->app->bind(IShop::class, PhpArrayShop::class);
+            $this->app->bind(IShopData::class, PhpArrayShop::class);
         }
         if (config('shop.cfg') == 'database')
         {
-            $this->app->bind(IShop::class, DatabaseShop::class);
+            $this->app->bind(IShopData::class, DatabaseShop::class);
         }
         $this->mergeConfigFrom(__DIR__.'/../config/shop.php', 'shop');
         $this->mergeConfigFrom(__DIR__.'/../config/shops.php', 'shops');

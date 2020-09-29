@@ -5,9 +5,20 @@ namespace Hanoivip\Shop\Services;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Hanoivip\Vip\Facades\VipFacade;
+use Hanoivip\Shop\Models\ShopOrder;
+use Hanoivip\GateClient\Facades\BalanceFacade;
+use Hanoivip\Game\Facades\GameHelper;
 
 class ShopService
 {
+    const UNPAID = 0;
+    const CANCEL = 1;
+    const PAID = 2;
+    
+    const UNSENT = 0;
+    const SENDFAIL = 1;
+    const SENT = 2;
+    
     private $shopData;
     
     public function __construct(
@@ -29,7 +40,7 @@ class ShopService
      */
     public function filterUserShops($uid)
     {
-        $shopCfgs = $this->shopData->all();
+        $shopCfgs = $this->shopData->allShop();
         $filtered = [];
         foreach ($shopCfgs as $cfg)
         {
@@ -90,7 +101,7 @@ class ShopService
      */
     public function getShopItems($shop, $items = [])
     {
-        
+        return $this->shopData->getShopItems($shop);
     }
     /**
      * 
@@ -101,45 +112,67 @@ class ShopService
      */
     public function caculatePrice($shop, $item, $count)
     {
-        
+        $itemDetail = $item;
+        if (gettype($item) == 'string')
+            $itemDetail = $this->shopData->getShopItems($shop, $item);
+        $price = new \stdClass();
+        $price->price = $count * $itemDetail->price;
+        $price->origin_price = $count * $itemDetail->origin_price;
+        return $price;
     }
-    
     /**
-     * Thành công: trả về true
-     * Thất bại: trả về lý do
      * 
-     * @param \Illuminate\Contracts\Auth\Authenticatable $user
-     * @param string $platform Platform name
-     * @param number $shop Shop ID
-     * @param string $item Item ID
+     * @param number $receiver 
+     * @param string $server
      * @param string $role
-     * @return string|boolean
+     * @param string $shop
+     * @param string $item
+     * @param number $count
+     * @return ShopOrder
      */
-    public function buy($user, $platform, $shop, $item, $role = null)
+    public function order($receiver, $server, $role, $shop, $item, $count)
     {
-        $uid = $user->getAuthIdentifier();
-        $shops = $this->shop->shopByPlatform($platform);
-        if (!isset($shops[$shop]))
-            return __('hanoivip::shop.not-exists');
-        $shopCfg = $shops[$shop];
-        $items = $shopCfg['items'];
-        if (!isset($items[$item]))
-            return __('hanoivip::shop.item-not-exists');
-        $itemCfg = $items[$item];
-        // Check price
-        $price = $itemCfg['price'];
-        if (!$this->balance->enough($uid, $price))
-            return __('hanoivip::shop.not-enough-coin');
-        // Add item to platform
-        $platformObj = $this->helper->getPlatform($platform);
-        if (!$platformObj->sendItem($user, $itemCfg['id'], $itemCfg['count'], $role))
-            return __('hanoivip::shop.send-item-fail');
-        // Charge User
-        $this->balance->remove($uid, $price, "Shop:{$shop}:{$item}");
-        // Save log
+        $price = $this->caculatePrice($shop, $item, $count);
+        $order = new ShopOrder();
+        $order->serial = str_random(8);
+        $order->receiver_id = $receiver;
+        $order->server = $server;
+        $order->role = $role;
+        $order->shop = $shop;
+        $order->item = $item;
+        $order->count = $count;
+        $order->price = $price->price;
+        $order->origin_price = $price->origin_price;
+        $order->status = self::UNPAID;
+        $order->send_status = self::UNSENT;
+        $order->save();
+        return $order;
+    }
+    /**
+     * 
+     * @param number $payer Payer user id
+     * @param string $serial
+     * @return string|boolean True if success, string is fail reason
+     */
+    public function pay($payer, $serial)
+    {
+        $order = ShopOrder::where('serial', $serial)->get();
+        if ($order->isEmpty())
+            return __('shop.order.invalid');
+        $order = $order->first();
+        if ($order->status != self::UNPAID)
+            return __('shop.order.finished');
+        $enough = BalanceFacade::enough($payer, $order->price);
+        if (empty($enough))
+            return __('shop.order.not-enough-money');
+        $paid = BalanceFacade::remove($payer, $order->price);
+        if (empty($paid))
+            return __('shop.order.charge-error');
+        $order->status = self::PAID;
+        $order->save();
+        // send item to game
+        GameHelper::sendItem($payer, $order->server, $order->item, $order->count, $order->role);
         return true;
     }
-    
-    
     
 }

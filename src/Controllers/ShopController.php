@@ -1,7 +1,6 @@
 <?php
 namespace Hanoivip\Shop\Controllers;
 
-use Hanoivip\Shop\Services\IShop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Hanoivip\Shop\Services\ShopService;
@@ -9,13 +8,10 @@ use Hanoivip\Shop\Services\ShopService;
 class ShopController extends Controller
 {
 
-    protected $shop;
-
     protected $shopBusiness;
 
-    public function __construct(IShop $shop, ShopService $shopBusiness)
+    public function __construct(ShopService $shopBusiness)
     {
-        $this->shop = $shop;
         $this->shopBusiness = $shopBusiness;
     }
 
@@ -30,7 +26,7 @@ class ShopController extends Controller
         $uid = Auth::user()->getAuthIdentifier();
         $shops = $this->shopBusiness->filterUserShops($uid);
         $shop = $this->shopBusiness->getDefaultShop();
-        if ($request->has('shop'))
+        if ($request->has('shop'))//shop id
             $shop = $request->input('shop');
         $shopItems = [];
         if (! empty($shop)) {
@@ -38,7 +34,7 @@ class ShopController extends Controller
         }
         return view('shop-list', [
             'shops' => $shops,
-            'shop' => $shop,
+            'current' => $shop,//current shop
             'shop_items' => $shopItems
         ]);
     }

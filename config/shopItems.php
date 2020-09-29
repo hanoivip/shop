@@ -5,38 +5,50 @@
  */
 
 // Configure Items in each Shop
-// DailyLimit??
+// limit => DailyLimit, TotalLimit
 return [
     'common' => [
-        'CommonItem1' => [
+        1 => [
+            'id' => 1,
             'title' => 'Item Name in Shop',
-            'id' => 'comitemid1',
+            'code' => 'CommonItem1',
             'price' => 10,
             'price_type' => 'xu',
-            'count' => 5
+            'image' => '/shop/CommonItem1.png',
+            'limit' => [
+            ]
         ],
     ],
     'daily' => [],
     'shopvip1' => [
-        'VipItem1' => [
+        1 => [
+            'id' => 1,
             'title' => 'Item Name in Shop',
-            'id' => 'vipitemid1',
+            'code' => 'VipItem1',
             'price' => 10,
             'price_type' => 'xu',
-            'count' => 5
+            'image' => '/shop/VipItem1.png',
+            'limit' => [
+                'TotalLimit' => 10,
+                'DailyLimit' => 5
+            ]
         ],
     ],
     'shopvip2' => [],
     'shopvip3' => [],
     'rare' => [],
     'rarevip' => [
-        'RareItem1' => [
+        1 => [
+            'id' => 1,
             'title' => 'Item Name in Shop',
-            'id' => 'rareitemid1',
+            'code' => 'RareItem1',
             'price' => 10,
             'price_type' => 'xu',
-            'count' => 5,
             'daily_limit' => 1,
+            'image' => '/shop/RareItem1.png',
+            'limit' => [
+                'TotalLimit' => 10,
+            ]
         ],
     ],
 ];

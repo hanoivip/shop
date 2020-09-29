@@ -18,9 +18,7 @@ return [
         'id' => 1,
         'name' => 'Normal Web Shop',
         'unlock' => [],
-        'items' => [
-            'common'
-        ],
+        'items' => 'common'
     ],
     2 => [
         'id' => 2,
@@ -31,9 +29,7 @@ return [
                 'value' => 1,
             ]
         ],
-        'items' => [
-            'shopvip1'
-        ],
+        'items' => 'shopvip1'
     ],
     3 => [
         'id' => 3,
@@ -48,9 +44,7 @@ return [
                 'value' => 0,
             ],
         ],
-        'items' => [
-            'rare'
-        ],
+        'items' => 'rare',
         'start_time' => '2020-09-18 00:00:00', 
         'end_time' => '2020-10-18 00:00:00',
     ],
@@ -71,8 +65,6 @@ return [
                 'value' => 3,
             ]
         ],
-        'items' => [
-            'rarevip'
-        ],
+        'items' => 'rarevip',
     ]
 ];

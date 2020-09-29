@@ -2,71 +2,37 @@
 
 namespace Hanoivip\Shop\Services;
 
-use Hanoivip\Shop\Models\Shop;
-use Hanoivip\Shop\Models\ShopItem;
 
-class PhpArrayShop implements IShop
+class PhpArrayShop implements IShopData
 {
-    protected $platformHelper;
-    
-    public function __construct(PlatformHelper $helper)
+    public function allShop()
     {
-        $this->platformHelper = $helper;
-    }
-    
-    public function shopByPlatform($platform)
-    {
-        $shops = config('shops.' . $platform, []);
-        foreach ($shops as $sid => $shop)
+        $shops = config('shops', []);
+        $ret = [];
+        foreach ($shops as $id => $shop)
         {
-            $items = $this->itemByShop($shop);
-            unset($shops[$sid]['items']);
-            $shops[$sid]['items'] = $items;
+            $ret[$id] = json_decode(json_encode($shop));
         }
-        return $shops;
-        // convert to Shop models
-        $models = [];
-        foreach ($shops as $shop)
-        {
-            $m = new Shop();
-            $m->fill($shop);
-            $models[] = $m;
-        }
-        return $models;
-    }
-
-    public function activePlatform()
-    {
-        $platforms = config('shop.platforms', []);
-        $active = [];
-        foreach ($platforms as $platform => $cfg)
-        {
-            $platformName = config('shop.platforms.' . $platform . '.platform');
-            $platformObj = $this->platformHelper->getPlatform($platformName);
-            if (!empty($platformObj))
-                $active[] = $platform;
-        }
-        return $active;
+        return $ret;
     }
     
-    public function getPlatform($name)
+    public function getShopItems($shop, $items)
     {
-        return config('shop.platforms.' . $name, []);
-    }
-
-    public function itemByShop($shop)
-    {
-        $groups = $shop['items'];
-        $items = [];
-        foreach ($groups as $group)
+        $shops = config('shops', []);
+        $ret = [];
+        if (isset($shops[$shop]))
         {
-            $newItems = config('shopItems.' . $group, []);
-            if (!empty($newItems))
-                $items = array_merge($items, $newItems);
+            $group = $shops[$shop]->items;
+            $items = config('shopItems', []);
+            if (isset($items[$group]))
+            {
+                foreach ($items as $id => $item)
+                {
+                    $ret[$id] = json_decode(json_encode($item));
+                }
+            }
         }
-        return $items;
+        return $ret;
     }
-
-
     
 }

@@ -2,19 +2,32 @@
 
 namespace Hanoivip\Shop\Services;
 
-class DatabaseShop implements IShop
+use Hanoivip\Shop\Models\Shop;
+use Hanoivip\Shop\Models\ShopItem;
+
+class DatabaseShop implements IShopData
 {
-    public function shopByPlatform($platform)
-    {}
+    public function allShop()
+    {
+        $shops = Shop::get();
+        return $shops;
+    }
 
-    public function activePlatform()
-    {}
-
-    public function getPlatform($name)
-    {}
-
-    public function itemByShop($shop)
-    {}
-
+    public function getShopItems($shop, $items = null)
+    {
+        if (empty($items))
+        {
+            $ret = ShopItem::where('shop_id', $shop)->get();
+            return $ret;
+        }
+        else if (gettype($items) == 'array')
+        {
+            
+        }
+        else
+        {
+            
+        }
+    }
     
 }
