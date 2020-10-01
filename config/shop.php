@@ -5,5 +5,5 @@ return [
     // Support: array, database
     'cfg' => 'array',
     // Default shop to open
-    'default' => 'common'
+    'default' => 1
 ];

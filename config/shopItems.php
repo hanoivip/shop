@@ -12,9 +12,21 @@ return [
             'id' => 1,
             'title' => 'Item Name in Shop',
             'code' => 'CommonItem1',
+            'origin_price' => 15,
             'price' => 10,
             'price_type' => 'xu',
             'image' => '/shop/CommonItem1.png',
+            'limit' => [
+            ]
+        ],
+        2 => [
+            'id' => 2,
+            'title' => 'Item Name 2 in Shop',
+            'code' => 'CommonItem2',
+            'origin_price' => 15,
+            'price' => 11,
+            'price_type' => 'xu',
+            'image' => '/shop/CommonItem2.png',
             'limit' => [
             ]
         ],
@@ -25,6 +37,7 @@ return [
             'id' => 1,
             'title' => 'Item Name in Shop',
             'code' => 'VipItem1',
+            'origin_price' => 15,
             'price' => 10,
             'price_type' => 'xu',
             'image' => '/shop/VipItem1.png',
@@ -42,6 +55,7 @@ return [
             'id' => 1,
             'title' => 'Item Name in Shop',
             'code' => 'RareItem1',
+            'origin_price' => 15,
             'price' => 10,
             'price_type' => 'xu',
             'daily_limit' => 1,

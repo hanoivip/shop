@@ -17,6 +17,10 @@ class CreateShopOrders extends Migration
             $table->string('shop');
             $table->string('item');
             $table->integer('count');
+            $table->integer('price');
+            $table->integer('origin_price');
+            $table->integer('status');
+            $table->integer('send_status');
             $table->timestamps();
         });
     }

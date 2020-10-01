@@ -2,6 +2,8 @@
 
 namespace Hanoivip\Shop\Services;
 
+use Illuminate\Support\Facades\Log;
+
 
 class PhpArrayShop implements IShopData
 {
@@ -9,30 +11,53 @@ class PhpArrayShop implements IShopData
     {
         $shops = config('shops', []);
         $ret = [];
-        foreach ($shops as $id => $shop)
+        foreach ($shops as $shop)
         {
-            $ret[$id] = json_decode(json_encode($shop));
+            $id = $shop['id'];
+            $ret[$id] = (object)$shop;//json_decode(json_encode($shop));
+            $ret[$id]->unlock = [];
+            foreach ($shop['unlock'] as $cond)
+                $ret[$id]->unlock[] = (object)$cond;
         }
         return $ret;
     }
     
-    public function getShopItems($shop, $items)
+    public function getShopItems($shop, $items = null)
     {
-        $shops = config('shops', []);
-        $ret = [];
+        $shops = $this->allShop();
         if (isset($shops[$shop]))
         {
+            $ret = [];
             $group = $shops[$shop]->items;
-            $items = config('shopItems', []);
-            if (isset($items[$group]))
+            $itemsCfg = config('shopItems', []);
+            if (isset($itemsCfg[$group]))
             {
-                foreach ($items as $id => $item)
+                foreach ($itemsCfg[$group] as $item)
                 {
-                    $ret[$id] = json_decode(json_encode($item));
+                    $id = $item['id'];
+                    //Log::debug($items . '@' . print_r($item, true));
+                    if (!empty($items))
+                    {
+                        if (gettype($items) == 'string' &&
+                            $items == $item['code'])
+                        {
+                            return (object)$item;
+                        }
+                        if (gettype($items) == 'array' &&
+                            in_array($item['code'], $items))
+                        {
+                            $ret[$id] = (object)$item;
+                        }
+                    }
+                    else
+                    {
+                        $ret[$id] = (object)$item;
+                    }
                 }
             }
+            return $ret;
         }
-        return $ret;
+        return null;
     }
     
 }

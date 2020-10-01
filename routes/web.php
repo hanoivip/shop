@@ -5,22 +5,22 @@ Route::middleware([
     'web',
     'auth:web'
 ])->namespace('Hanoivip\Shop\Controllers')
-    ->prefix('user')
+    ->prefix('shop')
     ->group(function () {
     // Liệt kê các shop của người chơi = home of module
-    Route::get('/shop', 'ShopController@list')->name('shop');
+    Route::get('/', 'ShopController@list')->name('shop');
     // Chọn nhân vật, html ui
-    Route::get('/shop/helper', 'ShopController@roleHelper')->name('shop.helper');
+    Route::any('/helper', 'ShopController@roleHelper')->name('shop.helper');
     // Chọn vật phẩm, sv, nhân vật; hiển thị hóa đơn, html ui == preview order
-    Route::any('/shop/confirm', 'ShopController@confirm')->name('shop.confirm');
+    Route::any('/confirm', 'ShopController@confirm')->name('shop.confirm');
     // Tạo hóa đơn
-    Route::post('/shop/order', 'ShopController@order')->name('shop.order');
+    Route::post('/order', 'ShopController@order')->name('shop.order');
     // Thanh toán cho hóa đơn
-    Route::post('/shop/pay', 'ShopController@pay')->name('shop.pay');
+    Route::get('/pay', 'ShopController@pay')->name('shop.pay');
     // Màn hình cảm ơn, goal
-    Route::get('/shop/pay-success', 'ShopController@paySuccess')->name('shop.success');
+    Route::get('/pay-success', 'ShopController@paySuccess')->name('shop.success');
     // Danh sách các hóa đơn, trạng thái
-    Route::get('/shop/orders', 'ShopController@listOrder')->name('shop.orders');
+    Route::get('/orders', 'ShopController@listOrder')->name('shop.orders');
 });
 // Admin Domain
 Route::middleware([

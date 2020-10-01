@@ -48,6 +48,7 @@ class ShopService
             $conditions = $cfg->unlock;//['unlock']; very trouble some. 
             // need auto convert string to array if database source
             // https://stackoverflow.com/questions/53386990/convert-only-one-column-from-string-to-array-in-laravel-5
+            //Log::debug(print_r($conditions));
             foreach ($conditions as $cond)
             {
                 $type = $cond->type;//['type'];i donot want to waste my time
@@ -97,11 +98,11 @@ class ShopService
      * 
      * @param string $shop Shop code/name
      * @param array|string $items Item code or Array of item codes
-     * @return \stdClass[]
+     * @return \stdClass[]|\stdClass
      */
-    public function getShopItems($shop, $items = [])
+    public function getShopItems($shop, $items = null)
     {
-        return $this->shopData->getShopItems($shop);
+        return $this->shopData->getShopItems($shop, $items);
     }
     /**
      * 
@@ -166,7 +167,7 @@ class ShopService
         $enough = BalanceFacade::enough($payer, $order->price);
         if (empty($enough))
             return __('shop.order.not-enough-money');
-        $paid = BalanceFacade::remove($payer, $order->price);
+        $paid = BalanceFacade::remove($payer, $order->price, "ShopOrder" . $serial);
         if (empty($paid))
             return __('shop.order.charge-error');
         $order->status = self::PAID;

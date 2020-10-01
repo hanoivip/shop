@@ -3,6 +3,7 @@ namespace Hanoivip\Shop\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Hanoivip\Shop\Services\ShopService;
 
 class ShopController extends Controller
@@ -21,53 +22,65 @@ class ShopController extends Controller
      *
      * @param Request $request
      */
-    public function listShop(Request $request)
+    public function list(Request $request)
     {
         $uid = Auth::user()->getAuthIdentifier();
         $shops = $this->shopBusiness->filterUserShops($uid);
         $shop = $this->shopBusiness->getDefaultShop();
-        if ($request->has('shop'))//shop id
+        if ($request->has('shop')) // shop id
             $shop = $request->input('shop');
         $shopItems = [];
         if (! empty($shop)) {
             $shopItems = $this->shopBusiness->getShopItems($shop);
         }
-        return view('shop-list', [
+        return view('hanoivip::shop-list', [
             'shops' => $shops,
-            'current' => $shop,//current shop
+            'current' => $shop, // current shop
             'shop_items' => $shopItems
         ]);
     }
-    
+
+    /**
+     * Server role helpers
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function roleHelper(Request $request)
     {
         $shop = $request->input('shop');
         $item = $request->input('item');
         $count = $request->input('count');
+        session()->put('buying', ['shop' => $shop, 'item' => $item, 'count' => $count]);
         // open role wizard
         return redirect()->route('wizard.role', [
-            'shop' => $shop,
-            'item' => $item,
-            'count' => $count,
             'next' => 'shop.confirm'
         ]);
     }
 
     public function confirm(Request $request)
     {
-        $server = $request->input('server');
+        if (!session()->has('buying'))
+        {
+            return view('hanoivip::shop-item-confirm-error');
+        }
+        $server = $request->input('svname');
         $role = $request->input('role');
-        $shop = $request->input('shop');
-        $item = $request->input('item');
-        $count = $request->input('count');
+        $params = session()->get('buying');
+        $shop = $params['shop'];
+        $item = $params['item'];
+        $count = $params['count'];
+        Log::debug(print_r($params, true));
         // item detail
         $itemDetail = $this->shopBusiness->getShopItems($shop, $item);
+        Log::debug($item . ':' . print_r($itemDetail, true));
         // caculate final price
         $price = $this->shopBusiness->caculatePrice($shop, $itemDetail, $count);
         // include sale..
-        return view('shop-item-confirm', [
+        return view('hanoivip::shop-item-confirm', [
             'server' => $server,
             'role' => $role,
+            'shop' => $shop,
             'item_detail' => $itemDetail,
             'count' => $count,
             'price' => $price
@@ -90,7 +103,7 @@ class ShopController extends Controller
                 'order' => $order->serial
             ]);
         } else {
-            return view('shop-order-fail');
+            return view('hanoivip::shop-order-fail');
         }
     }
 
@@ -104,13 +117,10 @@ class ShopController extends Controller
         $serial = $request->input('order');
         $payer = Auth::user()->getAuthIdentifier();
         $result = $this->shopBusiness->pay($payer, $serial);
-        if ($result === true)
-        {
+        if ($result === true) {
             return redirect()->route('shop.success');
-        }
-        else
-        {
-            return view('shop-pay-fail');
+        } else {
+            return view('hanoivip::shop-pay-fail');
         }
     }
 
@@ -121,13 +131,15 @@ class ShopController extends Controller
      */
     public function paySuccess(Request $request)
     {
-        return view('shop-pay-success');
+        return view('hanoivip::shop-pay-success');
     }
-    
+
     public function listOrder(Request $request)
     {
         $uid = Auth::user()->getAuthIdentifier();
         $orders = $this->shopBusiness->listOrder($uid);
-        return view('shop-order-list', ['orders' => $orders]);
+        return view('hanoivip::shop-order-list', [
+            'orders' => $orders
+        ]);
     }
 }

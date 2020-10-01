@@ -18,13 +18,16 @@ class LibServiceProvider extends ServiceProvider
             __DIR__.'/../lang' => resource_path('lang/vendor/hanoivip'),
         ]);
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-        $this->loadTranslationsFrom( __DIR__.'/../lang', 'hanoivip');
+        $this->loadTranslationsFrom(__DIR__ . '/../lang', 'hanoivip');
         $this->loadViewsFrom(__DIR__ . '/../views', 'hanoivip');
         $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
     }
     
     public function register()
     {
+        $this->mergeConfigFrom(__DIR__.'/../config/shop.php', 'shop');
+        $this->mergeConfigFrom(__DIR__.'/../config/shops.php', 'shops');
+        $this->mergeConfigFrom(__DIR__.'/../config/shopItems.php', 'shopItems');
         if (config('shop.cfg') == 'array')
         {
             $this->app->bind(IShopData::class, PhpArrayShop::class);
@@ -33,8 +36,5 @@ class LibServiceProvider extends ServiceProvider
         {
             $this->app->bind(IShopData::class, DatabaseShop::class);
         }
-        $this->mergeConfigFrom(__DIR__.'/../config/shop.php', 'shop');
-        $this->mergeConfigFrom(__DIR__.'/../config/shops.php', 'shops');
-        $this->mergeConfigFrom(__DIR__.'/../config/shopItems.php', 'shopItems');
     }
 }
