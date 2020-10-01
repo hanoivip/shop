@@ -1,6 +1,6 @@
 @extends('hanoivip::layouts.app-test')
 
-@section('title', 'Order fail')
+@section('title', 'Item bought')
 
 @section('content')
 

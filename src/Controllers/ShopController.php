@@ -120,7 +120,7 @@ class ShopController extends Controller
         if ($result === true) {
             return redirect()->route('shop.success');
         } else {
-            return view('hanoivip::shop-pay-fail');
+            return view('hanoivip::shop-pay-fail', ['error' => $result]);
         }
     }
 

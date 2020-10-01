@@ -170,10 +170,11 @@ class ShopService
         $paid = BalanceFacade::remove($payer, $order->price, "ShopOrder" . $serial);
         if (empty($paid))
             return __('shop.order.charge-error');
+        // send item to game
+        GameHelper::sendItem($order->receiver_id, $order->server, $order->item, $order->count, $order->role);
+        // save status
         $order->status = self::PAID;
         $order->save();
-        // send item to game
-        GameHelper::sendItem($payer, $order->server, $order->item, $order->count, $order->role);
         return true;
     }
     
