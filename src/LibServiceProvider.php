@@ -14,6 +14,7 @@ class LibServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../config/shops.php' => config_path('shops.php'),
             __DIR__.'/../config/shop.php' => config_path('shop.php'),
+            __DIR__.'/../config/shopItems.php' => config_path('shopItems.php'),
             __DIR__.'/../views' => resource_path('views/vendor/hanoivip'),
             __DIR__.'/../lang' => resource_path('lang/vendor/hanoivip'),
         ]);
@@ -26,8 +27,8 @@ class LibServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__.'/../config/shop.php', 'shop');
-        $this->mergeConfigFrom(__DIR__.'/../config/shops.php', 'shops');
-        $this->mergeConfigFrom(__DIR__.'/../config/shopItems.php', 'shopItems');
+        //$this->mergeConfigFrom(__DIR__.'/../config/shops.php', 'shops');
+        //$this->mergeConfigFrom(__DIR__.'/../config/shopItems.php', 'shopItems');
         if (config('shop.cfg') == 'array')
         {
             $this->app->bind(IShopData::class, PhpArrayShop::class);

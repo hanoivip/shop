@@ -16,7 +16,7 @@ class CreateShopItems extends Migration
             $table->integer('origin_price');
             $table->integer('price');
             $table->integer('price_type');
-            //$table->integer('count')->default(1);
+            $table->string('image');
             $table->string('limit')->default('[]')->comment('Array of limit object');
             $table->timestamps();
         });

@@ -12,6 +12,8 @@ class CreateShops extends Migration
             $table->increments('id');
             $table->string('name')->comment('Just display name');
             $table->string('unlock')->default('[]')->comment('Unlock conditions. Array of condition: time, vip, ..');
+            $table->integer('start_time')->default(0);
+            $table->integer('end_time')->default(0);
             $table->timestamps();
         });
     }

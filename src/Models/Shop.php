@@ -8,6 +8,6 @@ class Shop extends Model
 {
     public function getUnlockAttribute($value)
     {
-        return json_decode(json_encode($value));
+        return json_decode($value);
     }
 }

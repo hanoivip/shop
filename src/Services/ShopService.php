@@ -48,7 +48,7 @@ class ShopService
             $conditions = $cfg->unlock;//['unlock']; very trouble some. 
             // need auto convert string to array if database source
             // https://stackoverflow.com/questions/53386990/convert-only-one-column-from-string-to-array-in-laravel-5
-            //Log::debug(print_r($conditions));
+            // Log::debug('xxx' . print_r($conditions, true));
             foreach ($conditions as $cond)
             {
                 $type = $cond->type;//['type'];i donot want to waste my time

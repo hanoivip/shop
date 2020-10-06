@@ -9,7 +9,7 @@ class DatabaseShop implements IShopData
 {
     public function allShop()
     {
-        $shops = Shop::get();
+        $shops = Shop::all();
         return $shops;
     }
 
@@ -19,7 +19,7 @@ class DatabaseShop implements IShopData
         {
             // all() : array of eloquent object
             // toArray(): array of array
-            $ret = ShopItem::where('shop_id', $shop)->all();
+            $ret = ShopItem::where('shop_id', $shop)->get()->all();
             return $ret;
         }
         else if (gettype($items) == 'array')
