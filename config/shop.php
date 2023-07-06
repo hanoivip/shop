@@ -3,7 +3,7 @@
 // Configure Shop Platforms
 return [
     // Support: array, database
-    'cfg' => 'array',
+    'cfg' => 'database',
     // Default shop to open
     'default' => 1
 ];
