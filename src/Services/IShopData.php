@@ -1,7 +1,6 @@
 <?php
 
 namespace Hanoivip\Shop\Services;
-
 /**
  * 
  * @author gameo
@@ -13,7 +12,7 @@ interface IShopData
      * Return all avaiable shop
      * @return \stdClass[]
      */
-    public function allShop();
+    public function allShop($shop = null);
     /**
      * Get shop items
      * @param string $shop

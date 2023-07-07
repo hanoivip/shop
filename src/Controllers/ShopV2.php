@@ -4,9 +4,9 @@ namespace Hanoivip\Shop\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Hanoivip\Shop\Services\ShopService;
 use Hanoivip\Shop\Services\ICartService;
 use Hanoivip\Shop\Services\OrderService;
+use Hanoivip\Shop\Services\ShopService;
 
 class ShopV2 extends Controller
 {
@@ -32,7 +32,8 @@ class ShopV2 extends Controller
     public function list(Request $request)
     {
         $userId = Auth::user()->getAuthIdentifier();
-        try {
+        try 
+        {
             $list = $this->shopBusiness->filterUserShops($userId);
         } 
         catch (Exception $ex) 
@@ -55,7 +56,8 @@ class ShopV2 extends Controller
             $userId = Auth::user()->getAuthIdentifier();
             if ($this->shopBusiness->canOpen($userId, $shop))
             {
-                $items = $this->shopBusiness->getShopItems($userId, $shop);
+                //TODO: user dedicated shop items?
+                $items = $this->shopBusiness->getShopItems($shop);
             }
             else
             {
@@ -132,6 +134,34 @@ class ShopV2 extends Controller
         ]); 
     }
     
+    public function viewCart(Request $request)
+    {
+        $cart = $request->input('cart');
+        $message = null;
+        $error_message = null;
+        try
+        {
+            $record = $this->cartBusiness->getDetail($cart);
+            if ($record === true)
+            {
+            }
+            else
+            {
+                $error_message = $result;
+            }
+        }
+        catch (Exception $ex)
+        {
+            Log::error("ShopV2 view cart exception: " . $ex->getMessage());
+            $error_message = __('hanoivip.shop::cart.view.error');
+        }
+        return view('hanoivip::cart', [
+            'cart' => $record,
+            'message' => $message,
+            'error_message' => $error_message,
+        ]); 
+    }
+    
     public function order(Request $request)
     {
         $cart = $request->input('cart');
@@ -139,7 +169,9 @@ class ShopV2 extends Controller
         $error_message = null;
         try
         {
-            $result = $this->cartBusiness->order($cart);
+            $userId = Auth::user()->getAuthIdentifier();
+            $record = $this->cartBusiness->getDetail($cart);
+            $result = $this->orderService->order($userId, $cart);
             if ($result === true)
             {
                 $message = __('hanoivip.shop::cart.order.success');
@@ -168,7 +200,7 @@ class ShopV2 extends Controller
         $error_message = null;
         try
         {
-            $record = $this->cartBusiness->getRecord($cart);
+            $record = $this->cartBusiness->getDetail($cart);
         }
         catch (Exception $ex)
         {

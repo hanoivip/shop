@@ -7,10 +7,20 @@ use Hanoivip\Shop\Models\ShopItem;
 
 class DatabaseShop implements IShopData
 {
-    public function allShop()
+    public function allShop($shop = null)
     {
-        $shops = Shop::all();
-        return $shops;
+        if (empty($shop))
+        {
+            return Shop::all();
+        }
+        else if (gettype($shop) == 'array')
+        {
+            
+        }
+        else
+        {
+            return Shop::where('id', $shop)->get();
+        }
     }
 
     public function getShopItems($shop, $items = null)

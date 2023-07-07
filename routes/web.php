@@ -42,7 +42,7 @@ Route::middleware([
     Route::post('/order', 'ShopV2@order')->name('shopv2.order');
     Route::get('/order/{$order}', 'ShopV2@viewOrder')->name('shopv2.order.view');
     // Payment
-    Route::post('/pay/{$order}', 'ShopV2@pay')->name('shopv2.pay');
+    Route::get('/pay/{$order}', 'ShopV2@pay')->name('shopv2.pay');
     //Route::post('/pay/callback', 'ShopV2@payCallback')->name('shopv2.pay.callback');
 });
 

@@ -8,5 +8,5 @@ interface ICartService
     
     public function removeFromCart($userId, $itemId);
     
-    public function order($cart);
+    public function getDetail($cart);
 }

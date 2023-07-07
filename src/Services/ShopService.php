@@ -1,5 +1,4 @@
 <?php
-
 namespace Hanoivip\Shop\Services;
 
 use Carbon\Carbon;
@@ -27,6 +26,47 @@ class ShopService
         $this->shopData = $shopData;   
     }
     
+    public function canOpen($userId, $shop)
+    {
+        $shopCfg = $this->shopData->allShop($shop);
+        return $this->isUnlock($userId, $shopCfg);
+    }
+    /**
+     * 
+     * @param number $uid User ID
+     * @param Shop $cfg
+     * @return boolean
+     */
+    protected function isUnlock($uid, $cfg)
+    {
+        $unlock = true;
+        $conditions = $cfg->unlock;//['unlock']; very trouble some.
+        // need auto convert string to array if database source
+        // https://stackoverflow.com/questions/53386990/convert-only-one-column-from-string-to-array-in-laravel-5
+        // Log::debug('xxx' . print_r($conditions, true));
+        foreach ($conditions as $cond)
+        {
+            $type = $cond->type;//['type'];i donot want to waste my time
+            $value = $cond->value;//['value'];it is too strictly
+            //$id = $cond['id'];
+            switch ($type)
+            {
+                case 'VipLevel':
+                    $unlock = $unlock && $this->checkVipLevel($uid, $value);
+                    break;
+                case 'AfterTime':
+                    $unlock = $unlock && $this->checkAfterTime($value);
+                    break;
+                case 'BeforeTime':
+                    $unlock = $unlock && $this->checkBeforeTime($value);
+                    break;
+                default:
+                    Log::warn("ShopService condition type {$type} is unknown.");
+            }
+        }
+        return $unlock;
+    }
+    
     /**
      * Lọc ra các shop phù hợp với người chơi.
      * 
@@ -44,33 +84,10 @@ class ShopService
         $filtered = [];
         foreach ($shopCfgs as $cfg)
         {
-            $unlock = true;
-            $conditions = $cfg->unlock;//['unlock']; very trouble some. 
-            // need auto convert string to array if database source
-            // https://stackoverflow.com/questions/53386990/convert-only-one-column-from-string-to-array-in-laravel-5
-            // Log::debug('xxx' . print_r($conditions, true));
-            foreach ($conditions as $cond)
+            if ($this->isUnlock($uid, $cfg))
             {
-                $type = $cond->type;//['type'];i donot want to waste my time
-                $value = $cond->value;//['value'];it is too strictly
-                //$id = $cond['id'];
-                switch ($type)
-                {
-                    case 'VipLevel':
-                        $unlock = $unlock && $this->checkVipLevel($uid, $value);
-                        break;
-                    case 'AfterTime':
-                        $unlock = $unlock && $this->checkAfterTime($value);
-                        break;
-                    case 'BeforeTime':
-                        $unlock = $unlock && $this->checkBeforeTime($value);
-                        break;
-                    default:
-                        Log::warn("ShopService condition type {$type} is unknown.");
-                }
-            }
-            if ($unlock)
                 $filtered[] = $cfg;
+            }
         }
         return $filtered;
     }
@@ -101,7 +118,7 @@ class ShopService
      * @return \stdClass[]|\stdClass
      */
     public function getShopItems($shop, $items = null)
-    {
+    { 
         return $this->shopData->getShopItems($shop, $items);
     }
     /**
@@ -111,7 +128,7 @@ class ShopService
      * @param number $count
      * @return \stdClass Price object: price, origin_price
      */
-    public function caculatePrice($shop, $item, $count)
+    public function caculatePrice($shop, $item, $count = 1)
     {
         $itemDetail = $item;
         if (gettype($item) == 'string')
