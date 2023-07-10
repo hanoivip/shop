@@ -39,6 +39,10 @@ class ShopService
      */
     protected function isUnlock($uid, $cfg)
     {
+        if (empty($cfg))
+        {
+            throw new Exception("Shop unlock checked on empty config.");
+        }
         $unlock = true;
         $conditions = $cfg->unlock;//['unlock']; very trouble some.
         // need auto convert string to array if database source
@@ -147,7 +151,7 @@ class ShopService
      * @param string $item
      * @param number $count
      * @return ShopOrder
-     */
+     *
     public function order($receiver, $server, $role, $shop, $item, $count)
     {
         // Check limit???
@@ -166,7 +170,8 @@ class ShopService
         $order->send_status = self::UNSENT;
         $order->save();
         return $order;
-    }
+    }*/
+    
     /**
      * 
      * @param number $payer Payer user id
@@ -195,8 +200,4 @@ class ShopService
         return true;
     }
     
-    public function listOrder($userId)
-    {
-        return [];
-    }
 }

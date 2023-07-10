@@ -19,6 +19,7 @@ class ItemVO
     
     public $currency;
     /**
+     * 0 - Undefined
      * 1 - Send to game role item bags
      * 2 - Send to game role currency bags
      * 3 - Send to web account

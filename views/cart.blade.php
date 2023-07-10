@@ -6,7 +6,7 @@
 
 @if (!empty($cart->items))
 	@foreach ($cart->items as $item)
-		<p>Item name: $item->name </p>
+		<p>Item name: $item->title </p>
 		@foreach ($item->images as $image)
 			<img href="{{$image}}"/>
 		@endforeach

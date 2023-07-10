@@ -19,7 +19,7 @@ class DatabaseShop implements IShopData
         }
         else
         {
-            return Shop::where('id', $shop)->get();
+            return Shop::where('id', $shop)->first();
         }
     }
 

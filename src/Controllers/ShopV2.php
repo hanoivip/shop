@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Hanoivip\Shop\Services\ICartService;
 use Hanoivip\Shop\Services\OrderService;
 use Hanoivip\Shop\Services\ShopService;
+use Hanoivip\Shop\Services\ReceiptService;
 
 class ShopV2 extends Controller
 {
@@ -22,11 +23,13 @@ class ShopV2 extends Controller
     public function __construct(
         ShopService $shopBusiness,
         ICartService $cartBusiness,
-        OrderService $orderService)
+        OrderService $orderService,
+        ReceiptService $receiptService)
     {
         $this->shopBusiness = $shopBusiness;
         $this->cartBusiness = $cartBusiness;
         $this->orderService = $orderService;
+        $this->receiptBusiness = $receiptService;
     }
     
     public function list(Request $request)
@@ -38,9 +41,9 @@ class ShopV2 extends Controller
         } 
         catch (Exception $ex) 
         {
-            
+            Log::error("ShopV2 list shop exception: " . $ex->getMessage());
         }
-        return view('hanoivip::shop-list', [
+        return view('hanoivip::shopv2-list', [
             'shops' => $list
         ]);
     }
@@ -200,7 +203,7 @@ class ShopV2 extends Controller
         $error_message = null;
         try
         {
-            $record = $this->cartBusiness->getDetail($cart);
+            $record = $this->orderService->detail($order);
         }
         catch (Exception $ex)
         {
@@ -239,7 +242,7 @@ class ShopV2 extends Controller
     {
         $order = $request->input('order');
         $receipt = $request->input('receipt');
-        $record = $this->orderService->getRecord($order);
+        $record = $this->orderService->detail($order);
         $message = null;
         $error_message = null;
         try

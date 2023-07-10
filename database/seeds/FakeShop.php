@@ -14,11 +14,11 @@ class FakeShop extends Seeder
         Shop::query()->truncate();
         DB::table('shops')->insert(
             [
-                'name' => 'Normal Web Shop',
+                'name' => 'Normal Testing Shop',
             ]);
         DB::table('shops')->insert(
             [
-                'name' => 'Vip Shop',
+                'name' => 'Vip Testing Shop',
                 'unlock' => json_encode([
                     [
                         'type' => 'VipLevel',
@@ -27,31 +27,29 @@ class FakeShop extends Seeder
             ]);
         DB::table('shops')->insert(
             [
-                'name' => 'Rare Shop',
+                'name' => 'Time limited Testing Shop',
                 'unlock' => json_encode([
                     [
                         'type' => 'AfterTime',
-                        'value' => 9999999,
+                        'value' => Carbon::parse('2023-07-01 00:00:00')->timestamp,
                     ],
                     [
                         'type' => 'BeforeTime',
-                        'value' => 0,
+                        'value' => Carbon::parse('2023-08-01 00:00:00')->timestamp,
                     ],
                 ]),
-                'start_time' => Carbon::parse('2020-10-01 00:00:00')->timestamp,
-                'end_time' => Carbon::parse('2020-12-18 00:00:00')->timestamp,
             ]);
         DB::table('shops')->insert(
             [
-                'name' => 'Rare Shop Vip',
+                'name' => 'Rare Vip Testing Shop',
                 'unlock' => json_encode([
                     [
                         'type' => 'AfterTime',
-                        'value' => 9999999,
+                        'value' => Carbon::parse('2023-07-01 00:00:00')->timestamp,
                     ],
                     [
                         'type' => 'BeforeTime',
-                        'value' => 0,
+                        'value' => Carbon::parse('2023-08-01 00:00:00')->timestamp,
                     ],
                     [
                         'type' => 'VipLevel',
@@ -59,28 +57,30 @@ class FakeShop extends Seeder
                     ]
                 ]),
             ]);
-        $normalShop = Shop::where('name', 'Normal Web Shop')->first();
+        $normalShop = Shop::where('name', 'Normal Testing Shop')->first();
         DB::table('shop_items')->insert([
             [
                 'shop_id' => $normalShop->id,
-                'title' => 'Item Name in Shop',
+                'title' => 'Diamond Package 1',
                 'code' => 'CommonItem1',
                 'origin_price' => 15,
                 'price' => 10,
-                'price_type' => 0,
-                'image' => '/shop/CommonItem1.png',
+                'images' => json_encode(['/shop/diamond1.png']),
+                'description' => 'Test for selling diamonds...',
+                '$delivery_type' => 1,
             ],
             2 => [
                 'shop_id' => $normalShop->id,
-                'title' => 'Item Name 2 in Shop',
+                'title' => 'Diamond Package 2',
                 'code' => 'CommonItem2',
                 'origin_price' => 15,
                 'price' => 11,
-                'price_type' => 0,
-                'image' => '/shop/CommonItem2.png',
+                'images' => json_encode(['/shop/diamond2.png']),
+                'description' => 'Test for selling diamonds...',
+                '$delivery_type' => 1,
             ],
         ]);
-        $vipShop = Shop::where('name', 'Vip Shop')->first();
+        $vipShop = Shop::where('name', 'Vip Testing Shop')->first();
         DB::table('shop_items')->insert([
             [
                 'shop_id' => $vipShop->id,
@@ -88,12 +88,13 @@ class FakeShop extends Seeder
                 'code' => 'VipItem1',
                 'origin_price' => 15,
                 'price' => 10,
-                'price_type' => 0,
-                'image' => '/shop/VipItem1.png',
+                'images' => json_encode(['/shop/VipItem1.png']),
                 'limit' => json_encode([
                     'TotalLimit' => 10,
                     'DailyLimit' => 5
-                ])
+                ]),
+                'description' => 'Test for selling VIP item...',
+                '$delivery_type' => 1,
             ],
         ]);
     }

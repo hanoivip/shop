@@ -50,7 +50,7 @@ class OrderService
         $price = $this->calculatePrice($cart);
         $order = new ShopOrder();
         $order->serial = Str::random(8);
-        $order->receiver_id = $userId;
+        $order->user_id = $userId;
         //$order->server = $server;
         //$order->role = $role;
         //$order->shop = $shop;
@@ -71,6 +71,6 @@ class OrderService
      */
     public function detail($order)
     {
-        
+        return ShopOrder::where('serial', $order)->first();
     }
 }
