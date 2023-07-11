@@ -1,6 +1,8 @@
 <?php
 namespace Hanoivip\Shop\ViewObjects;
 
+use Illuminate\Support\Str;
+
 class CartVO
 {
     public $id;
@@ -17,5 +19,6 @@ class CartVO
     {
         $this->shop = $shop;
         $this->id = Str::random(6);
+        $this->items = [];
     }
 }

@@ -9,6 +9,12 @@
       @else
       		<a href="{{route('login')}}"><b>Đăng Nhập</b></a>
       @endif
+      @if (!empty($message))
+      	<p>{{$message}}</p>
+      @endif
+      @if (!empty($error_message))
+      	<p>{{$error_message}}</p>
+      @endif
       @yield('content')
 </body>
 </html>

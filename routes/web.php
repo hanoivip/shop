@@ -37,13 +37,14 @@ Route::middleware([
     // Cart, max item number is configurable
     Route::post('/cart/remove', 'ShopV2@removeFromCart')->name('shopv2.cart.remove');
     Route::post('/cart/add', 'ShopV2@addToCart')->name('shopv2.cart.add');
-    Route::get('/cart', 'ShopV2@cart')->name('shopv2.cart');
+    Route::get('/cart', 'ShopV2@viewCart')->name('shopv2.cart');
     // Order
     Route::post('/order', 'ShopV2@order')->name('shopv2.order');
-    Route::get('/order/{$order}', 'ShopV2@viewOrder')->name('shopv2.order.view');
+    Route::get('/order/{order}', 'ShopV2@viewOrder')->name('shopv2.order.view');
     // Payment
-    Route::get('/pay/{$order}', 'ShopV2@pay')->name('shopv2.pay');
+    Route::get('/pay/{order}', 'ShopV2@pay')->name('shopv2.pay');
     //Route::post('/pay/callback', 'ShopV2@payCallback')->name('shopv2.pay.callback');
+    Route::post('/order/drop', 'ShopV2@dropCart')->name('shopv2.cart.drop');
 });
 
 Route::middleware([
@@ -51,7 +52,7 @@ Route::middleware([
 ])->namespace('Hanoivip\Shop\Controllers')
 ->prefix('shopv2')
 ->group(function () {
-    Route::post('/pay/callback', 'ShopV2@payCallback')->name('shopv2.pay.callback');
+    Route::get('/pay-callback', 'ShopV2@payCallback')->name('shopv2.pay.callback');
 });
     
 // Admin Domain

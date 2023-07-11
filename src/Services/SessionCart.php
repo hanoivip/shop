@@ -4,6 +4,7 @@ namespace Hanoivip\Shop\Services;
 
 use Hanoivip\Shop\Services\ICartService;
 use Hanoivip\Shop\ViewObjects\CartVO;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Cart implement by session
@@ -51,6 +52,7 @@ class SessionCart implements ICartService
         {
             return __("hanoivip.shop::cart.full");
         }
+        $itemRecord->count = 1;
         $cart->items[] = $itemRecord;
         //save
         session()->put($key, $cart);
@@ -80,7 +82,7 @@ class SessionCart implements ICartService
                 $dindex = $index; break;
             }
         }
-        if ($dindex > 0)
+        if ($dindex > -1)
         {
             unset($cart->items[$dindex]);
             //save
@@ -103,6 +105,27 @@ class SessionCart implements ICartService
                 }
                 return $cart;
             }
+        }
+    }
+    
+    public function getUserCart($userId)
+    {
+        $key = "ShopCart@" . $userId;
+        if (session()->has($key))
+        {
+            return session()->get($key, null);
+        }
+    }
+    
+    public function emptyCart($userId)
+    {
+        $cart = $this->getUserCart($userId);
+        if (!empty($cart))
+        {
+            Log::debug("Cart empty player $userId");
+            $key = "ShopCart@" . $userId;
+            session()->put($cart->id, null);
+            session()->put($key, null);
         }
     }
 }

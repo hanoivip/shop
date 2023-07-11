@@ -2,6 +2,8 @@
 namespace Hanoivip\Shop\Services;
 
 use Hanoivip\Shop\ViewObjects\CartVO;
+use Hanoivip\Shop\Models\ShopOrder;
+use Illuminate\Support\Str;
 
 class OrderService
 {
@@ -24,17 +26,27 @@ class OrderService
      * @param CartVO $cart
      * @return \stdClass
      */
-    private function calcualatePrice($cart)
+    private function calculatePrice($cart)
     {
         $price = new \stdClass();
         $price->origin_price = 0;
         $price->price = 0;
+        $price->currency = null;
         if (!empty($cart->items))
         {   
             foreach ($cart->items as $item)
             {
                 $price->origin_price += $item->origin_price * $item->count;
                 $price->price += $item->price * $item->count;
+                if (empty($price->currency))
+                {
+                    $price->currency = $item->currency;
+                }
+                else if ($price->currency != $item->currency)
+                {
+                    //TODO: might be convert 
+                    throw new Exception("Order service not allow multi-currency now");
+                }
             }
         }
         return $price;
@@ -47,20 +59,20 @@ class OrderService
      */
     public function order($userId, $cart)
     {
+        if (empty($cart->items))
+        {
+            return __('hanoivip.shop::order.cart-is-empty');
+        }
         $price = $this->calculatePrice($cart);
         $order = new ShopOrder();
         $order->serial = Str::random(8);
         $order->user_id = $userId;
-        //$order->server = $server;
-        //$order->role = $role;
-        //$order->shop = $shop;
-        //$order->item = $item;
-        //$order->count = $count;
         $order->cart = json_encode($cart);
         $order->price = $price->price;
         $order->origin_price = $price->origin_price;
-        $order->status = self::UNPAID;
-        $order->send_status = self::UNSENT;
+        $order->currency = $price->currency;
+        $order->payment_status = self::UNPAID;
+        $order->delivery_status = self::UNSENT;
         $order->save();
         return $order;
     }

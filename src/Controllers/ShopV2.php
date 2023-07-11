@@ -8,6 +8,7 @@ use Hanoivip\Shop\Services\ICartService;
 use Hanoivip\Shop\Services\OrderService;
 use Hanoivip\Shop\Services\ShopService;
 use Hanoivip\Shop\Services\ReceiptService;
+use Hanoivip\PaymentContract\Facades\PaymentFacade;
 
 class ShopV2 extends Controller
 {
@@ -72,7 +73,7 @@ class ShopV2 extends Controller
             Log::error("ShopV2 open shop exception: " . $ex->getMessage());
             $error_message = __('hanoivip.shop::open.error');
         }
-        return view('hanoivip::view-shop', [
+        return view('hanoivip::shopv2-view', [
             'items' => $items,
             'message' => $message,
             'error_message' => $error_message,
@@ -87,6 +88,7 @@ class ShopV2 extends Controller
         $error_message = null;
         try
         {
+            $userId = Auth::user()->getAuthIdentifier();
             $result = $this->cartBusiness->addToCart($userId, $shop, $item);
             if ($result === true)
             {
@@ -102,7 +104,7 @@ class ShopV2 extends Controller
             Log::error("ShopV2 add to cart exception: " . $ex->getMessage());
             $error_message = __('hanoivip.shop::cart.add.error');
         }
-        return view('hanoivip::cart-result', [
+        return view('hanoivip::shop-result', [
             'message' => $message,
             'error_message' => $error_message,
         ]); 
@@ -116,6 +118,7 @@ class ShopV2 extends Controller
         $error_message = null;
         try
         {
+            $userId = Auth::user()->getAuthIdentifier();
             $result = $this->cartBusiness->removeFromCart($userId, $item);
             if ($result === true)
             {
@@ -131,7 +134,7 @@ class ShopV2 extends Controller
             Log::error("ShopV2 remove from cart exception: " . $ex->getMessage());
             $error_message = __('hanoivip.shop::cart.remove.error');
         }
-        return view('hanoivip::cart-result', [
+        return view('hanoivip::shop-result', [
             'message' => $message,
             'error_message' => $error_message,
         ]); 
@@ -139,18 +142,15 @@ class ShopV2 extends Controller
     
     public function viewCart(Request $request)
     {
-        $cart = $request->input('cart');
         $message = null;
         $error_message = null;
         try
         {
-            $record = $this->cartBusiness->getDetail($cart);
-            if ($record === true)
+            $userId = Auth::user()->getAuthIdentifier();
+            $record = $this->cartBusiness->getUserCart($userId);
+            if (empty($record))
             {
-            }
-            else
-            {
-                $error_message = $result;
+                $error_message = __('hanoivip.shop::cart.view.error');
             }
         }
         catch (Exception $ex)
@@ -165,6 +165,27 @@ class ShopV2 extends Controller
         ]); 
     }
     
+    public function dropCart(Request $request)
+    {
+        $message = null;
+        $error_message = null;
+        try
+        {
+            $userId = Auth::user()->getAuthIdentifier();
+            $this->cartBusiness->emptyCart($userId);
+            $message = __('hanoivip.shop::cart.drop.success');
+        }
+        catch (Exception $ex)
+        {
+            Log::error("ShopV2 drop cart exception: " . $ex->getMessage());
+            $error_message = __('hanoivip.shop::cart.drop.error');
+        }
+        return view('hanoivip::cart', [
+            'message' => $message,
+            'error_message' => $error_message,
+        ]);
+    }
+    
     public function order(Request $request)
     {
         $cart = $request->input('cart');
@@ -174,14 +195,15 @@ class ShopV2 extends Controller
         {
             $userId = Auth::user()->getAuthIdentifier();
             $record = $this->cartBusiness->getDetail($cart);
-            $result = $this->orderService->order($userId, $cart);
-            if ($result === true)
+            $result = $this->orderService->order($userId, $record);
+            if (gettype($result) == 'string')
             {
-                $message = __('hanoivip.shop::cart.order.success');
+                $error_message = $result;
             }
             else
             {
-                $error_message = $result;
+                $this->cartBusiness->emptyCart($userId);
+                $message = __('hanoivip.shop::cart.order.success');
             }
         }
         catch (Exception $ex)
@@ -189,15 +211,14 @@ class ShopV2 extends Controller
             Log::error("ShopV2 order exception: " . $ex->getMessage());
             $error_message = __('hanoivip.shop::cart.order.error');
         }
-        return view('hanoivip::order-result', [
+        return view('hanoivip::shop-result', [
             'message' => $message,
             'error_message' => $error_message,
         ]); 
     }
     
-    public function viewOrder(Request $request)
+    public function viewOrder(Request $request, $order)
     {
-        $order = $request->input('order');
         $record = null;
         $message = null;
         $error_message = null;
@@ -211,15 +232,14 @@ class ShopV2 extends Controller
             $error_message = __('hanoivip.shop::cart.view.error');
         }
         return view('hanoivip::order', [
-            'record' => $record,
+            'order' => $record,
             'message' => $message,
             'error_message' => $error_message,
         ]);
     }
     
-    public function pay(Request $request)
+    public function pay(Request $request, $order)
     {
-        $order = $request->input('order');
         $client = null;
         $message = null;
         $error_message = null;
@@ -240,8 +260,10 @@ class ShopV2 extends Controller
     
     public function payCallback(Request $request)
     {
+        Log::debug("ShopV2 pay callback...");
         $order = $request->input('order');
         $receipt = $request->input('receipt');
+        Log::debug("ShopV2 pay callback $order $receipt");
         $record = $this->orderService->detail($order);
         $message = null;
         $error_message = null;
@@ -262,7 +284,7 @@ class ShopV2 extends Controller
             Log::error("ShopV2 pay callback exception: " . $ex->getMessage());
             $error_message = __('hanoivip.shop::pay.error');
         }
-        return view('hanoivip::pay-result', [
+        return view('hanoivip::shop-result', [
             'message' => $message,
             'error_message' => $error_message,
         ]);

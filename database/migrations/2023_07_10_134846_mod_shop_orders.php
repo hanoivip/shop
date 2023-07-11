@@ -21,6 +21,7 @@ class ModShopOrders extends Migration
             $table->text('cart')->nullable()->comment('cart detail');
             $table->integer('payment_status');
             $table->integer('delivery_status');
+            $table->string('currency');
         });
     }
 
@@ -31,6 +32,7 @@ class ModShopOrders extends Migration
             $table->dropColumn('cart');
             $table->dropColumn('payment_status');
             $table->dropColumn('delivery_status');
+            $table->dropColumn('currency');
             $table->integer('receiver_id');
             $table->string('server');
             $table->string('role');
