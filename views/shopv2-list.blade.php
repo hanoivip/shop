@@ -5,7 +5,7 @@
 @section('content')
 
 @foreach ($shops as $shop)
-	<a href="{{ route('shopv2', ['shop' => $shop->id]) }}">Open {{ $shop->name }}</a><br/>
+	<a href="{{ route('shopv2', ['shop' => $shop->slug]) }}">Open {{ $shop->name }}</a><br/>
 @endforeach 
 
 

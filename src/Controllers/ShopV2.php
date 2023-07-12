@@ -51,7 +51,7 @@ class ShopV2 extends Controller
 
     public function open(Request $request)
     {
-        $shop = $request->input('shop');
+        $shop = $request->input('shop');//slug
         $items = [];
         $message = null;
         $error_message = null;
@@ -260,10 +260,10 @@ class ShopV2 extends Controller
     
     public function payCallback(Request $request)
     {
-        Log::debug("ShopV2 pay callback...");
+        //Log::debug("ShopV2 pay callback...");
         $order = $request->input('order');
         $receipt = $request->input('receipt');
-        Log::debug("ShopV2 pay callback $order $receipt");
+        //Log::debug("ShopV2 pay callback $order $receipt");
         $record = $this->orderService->detail($order);
         $message = null;
         $error_message = null;
@@ -285,6 +285,28 @@ class ShopV2 extends Controller
             $error_message = __('hanoivip.shop::pay.error');
         }
         return view('hanoivip::shop-result', [
+            'message' => $message,
+            'error_message' => $error_message,
+        ]);
+    }
+    
+    public function history(Request $request)
+    {
+        $message = null;
+        $error_message = null;
+        $page = 0;
+        $records = [];
+        try
+        {
+            $userId = Auth::user()->getAuthIdentifier();
+            $records = $this->orderService->list($userId, $page);
+        }
+        catch (Exception $ex)
+        {
+            
+        }
+        return view('hanoivip::shopv2-history', [
+            'records' => $records,
             'message' => $message,
             'error_message' => $error_message,
         ]);

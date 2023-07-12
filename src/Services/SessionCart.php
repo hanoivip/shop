@@ -5,6 +5,7 @@ namespace Hanoivip\Shop\Services;
 use Hanoivip\Shop\Services\ICartService;
 use Hanoivip\Shop\ViewObjects\CartVO;
 use Illuminate\Support\Facades\Log;
+use Exception;
 
 /**
  * Cart implement by session
@@ -45,7 +46,7 @@ class SessionCart implements ICartService
         $itemRecord = $this->shopBusiness->getShopItems($shop, $item);
         if (empty($itemRecord))
         {
-            throw new Exception(__('hanoivip.shop::item.empty'));
+            throw new Exception(__('hanoivip.shop::item.not-found'));
         }
         $max = config('shop.cart.max', 1);
         if (count($cart->items) >= $max)

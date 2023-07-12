@@ -14,7 +14,7 @@
 			Name: {{$item->title}} </br>
 			Origin price: {{$item->origin_price}} </br>
 			Price: {{$item->price}}
-			<input type="hidden" name="shop" value="{{$item->shop->id}}"/>
+			<input type="hidden" name="shop" value="{{$item->shop->slug}}"/>
 			<input type="hidden" name="item" value="{{$item->code}}"/>
 			<input type="hidden" name="count" value="1"/>
 				@foreach ($item->images as $image)

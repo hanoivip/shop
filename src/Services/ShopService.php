@@ -7,6 +7,7 @@ use Hanoivip\Vip\Facades\VipFacade;
 use Hanoivip\Shop\Models\ShopOrder;
 use Hanoivip\GateClient\Facades\BalanceFacade;
 use Hanoivip\Game\Facades\GameHelper;
+use Exception;
 
 class ShopService
 {
@@ -25,7 +26,13 @@ class ShopService
     {
         $this->shopData = $shopData;   
     }
-    
+    /**
+     * 
+     * 
+     * @param number $userId
+     * @param string $shop Shop Slug
+     * @return boolean
+     */
     public function canOpen($userId, $shop)
     {
         $shopCfg = $this->shopData->allShop($shop);
@@ -117,7 +124,7 @@ class ShopService
     }
     /**
      * 
-     * @param string $shop Shop code/name
+     * @param string $shop Shop slug
      * @param array|string $items Item code or Array of item codes
      * @return \stdClass[]|\stdClass
      */
@@ -127,11 +134,11 @@ class ShopService
     }
     /**
      * 
-     * @param string $shop
+     * @param string $shop Shop ID
      * @param \stdClass|string $item Item object or item code
      * @param number $count
      * @return \stdClass Price object: price, origin_price
-     */
+     *
     public function caculatePrice($shop, $item, $count = 1)
     {
         $itemDetail = $item;
@@ -177,7 +184,7 @@ class ShopService
      * @param number $payer Payer user id
      * @param string $serial
      * @return string|boolean True if success, string is fail reason
-     */
+     *
     public function pay($payer, $serial)
     {
         $order = ShopOrder::where('serial', $serial)->get();
@@ -198,6 +205,10 @@ class ShopService
         $order->status = self::PAID;
         $order->save();
         return true;
+    }*/
+    public function newShop($name, $conditions)
+    {
+        return $this->shopData->newShop($name, $conditions);
     }
     
 }

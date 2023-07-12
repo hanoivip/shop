@@ -7,8 +7,8 @@ interface ICartService
     /**
      * 
      * @param number $userId
-     * @param number|string $shop Shop ID
-     * @param number|string $item Item ID
+     * @param number|string $shop Shop slug
+     * @param number|string $item Item code
      */
     public function addToCart($userId, $shop, $item);
     

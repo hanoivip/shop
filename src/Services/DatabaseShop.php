@@ -15,30 +15,35 @@ class DatabaseShop implements IShopData
         }
         else if (gettype($shop) == 'array')
         {
-            
+            return Shop::whereIn('slug', $shop)->get();
         }
         else
         {
-            return Shop::where('id', $shop)->first();
+            return Shop::where('slug', $shop)->first();
         }
     }
-
+    
     public function getShopItems($shop, $items = null)
     {
         if (empty($items))
         {
-            // all() : array of eloquent object
-            // toArray(): array of array
-            $ret = ShopItem::where('shop_id', $shop)->get()->all();
-            return $ret;
+            $shopRecord = Shop::where('slug', $shop)->first();
+            if (!empty($shopRecord))
+            {
+                return $shopRecord->items;
+            }
         }
         else if (gettype($items) == 'array')
         {
-            
+            return ShopItem::whereIn('code', $items)->where('shop_id', function ($query) use ($shop) {
+                $query->select('id')->from('shops')->where('slug', $shop)->first();
+            })->get();
         }
         else
         {
-            return ShopItem::where('shop_id', $shop)->where('code', $items)->first();
+            return ShopItem::where('code', $items)->where('shop_id', function ($query) use ($shop) {
+                $query->select('id')->from('shops')->where('slug', $shop)->first();
+            })->first();
         }
     }
     
