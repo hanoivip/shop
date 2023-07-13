@@ -21,6 +21,8 @@
 	<form method="post" action="{{route('shopv2.order')}}">
 		{{ csrf_field() }}
 		<input type="hidden" id="cart" name="cart" value="{{$cart->id}}" />
+		@if ($cart->delivery_type == 1 || $cart->delivery_type == 2)
+		@endif
 		<button type="submit">Order</button>
 	</form>
 	<form method="post" action="{{route('shopv2.cart.drop')}}">

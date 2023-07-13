@@ -15,19 +15,27 @@ use Illuminate\Support\Str;
 class ShopService
 {
     const UNPAID = 0;
-    const CANCEL = 1;
+    //const CANCEL = 1;
     const PAID = 2;
     
     const UNSENT = 0;
-    const SENDFAIL = 1;
+    const SENDING = 1;
     const SENT = 2;
     
-    private $shopData;
+    protected $shopData;
+    
+    protected $orderService;
+    
+    protected $receiptBusiness;
     
     public function __construct(
-        IShopData $shopData)
+        IShopData $shopData, 
+        OrderService $orderService,
+        ReceiptService $receiptService)
     {
-        $this->shopData = $shopData;   
+        $this->shopData = $shopData;  
+        $this->orderService = $orderService;
+        $this->receiptBusiness = $receiptService;
     }
     /**
      * 
@@ -135,80 +143,31 @@ class ShopService
     { 
         return $this->shopData->getShopItems($shop, $items);
     }
-    /**
-     * 
-     * @param string $shop Shop ID
-     * @param \stdClass|string $item Item object or item code
-     * @param number $count
-     * @return \stdClass Price object: price, origin_price
-     *
-    public function caculatePrice($shop, $item, $count = 1)
-    {
-        $itemDetail = $item;
-        if (gettype($item) == 'string')
-            $itemDetail = $this->shopData->getShopItems($shop, $item);
-        $price = new \stdClass();
-        $price->price = $count * $itemDetail->price;
-        $price->origin_price = $count * $itemDetail->origin_price;
-        return $price;
-    }
-    /**
-     * 
-     * @param number $receiver 
-     * @param string $server
-     * @param string $role
-     * @param string $shop
-     * @param string $item
-     * @param number $count
-     * @return ShopOrder
-     *
-    public function order($receiver, $server, $role, $shop, $item, $count)
-    {
-        // Check limit???
-        $price = $this->caculatePrice($shop, $item, $count);
-        $order = new ShopOrder();
-        $order->serial = str_random(8);
-        $order->receiver_id = $receiver;
-        $order->server = $server;
-        $order->role = $role;
-        $order->shop = $shop;
-        $order->item = $item;
-        $order->count = $count;
-        $order->price = $price->price;
-        $order->origin_price = $price->origin_price;
-        $order->status = self::UNPAID;
-        $order->send_status = self::UNSENT;
-        $order->save();
-        return $order;
-    }*/
     
-    /**
-     * 
-     * @param number $payer Payer user id
-     * @param string $serial
-     * @return string|boolean True if success, string is fail reason
-     *
-    public function pay($payer, $serial)
+    public function onPayDone($order, $receipt)
     {
-        $order = ShopOrder::where('serial', $serial)->get();
-        if ($order->isEmpty())
-            return __('shop.order.invalid');
-        $order = $order->first();
-        if ($order->status != self::UNPAID)
-            return __('shop.order.finished');
-        $enough = BalanceFacade::enough($payer, $order->price);
-        if (empty($enough))
-            return __('shop.order.not-enough-money');
-        $paid = BalanceFacade::remove($payer, $order->price, "ShopOrder" . $serial);
-        if (empty($paid))
-            return __('shop.order.charge-error');
-        // send item to game
-        GameHelper::sendItem($order->receiver_id, $order->server, $order->item, $order->count, $order->role);
-        // save status
-        $order->status = self::PAID;
-        $order->save();
+        $orderRec = $this->orderService->detail($order);
+        if (empty($orderRec))
+        {
+            return __('hanoivip.shop::order.invalid');
+        }
+        $check = $this->receiptBusiness->check($orderRec->user_id, $order, $receipt);
+        if (empty($check))
+        {
+            return __('hanoivip.shop::receipt.failure');
+        }
+        if ($oderRec->payment_status == self::UNPAID)
+        {
+            $orderRec->payment_status = self::PAID;
+        }
+        if ($orderRec->delivery_status == self::UNSENT)
+        {
+            $orderRec->payment_status = self::SENDING;
+            dispatch(new SendShopOrderJob($order));
+        }
+        $orderRec->save();
         return true;
-    }*/
+    }
     public function newShop($data)
     {
         $name = $data['name'];
@@ -236,7 +195,7 @@ class ShopService
     
     public function newShopItem($slug, $data)
     {
-        Log::debug(print_r($data, true));
+        //Log::debug(print_r($data, true));
         $shop = $this->shopData->allShop($slug);
         if (empty($shop))
         {

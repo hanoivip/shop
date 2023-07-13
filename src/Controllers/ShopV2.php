@@ -260,16 +260,13 @@ class ShopV2 extends Controller
     
     public function payCallback(Request $request)
     {
-        //Log::debug("ShopV2 pay callback...");
         $order = $request->input('order');
         $receipt = $request->input('receipt');
-        //Log::debug("ShopV2 pay callback $order $receipt");
-        $record = $this->orderService->detail($order);
         $message = null;
         $error_message = null;
         try
         {
-            $result = $this->receiptBusiness->check($record->user_id, $order, $receipt);
+            $result = $this->shopBusiness->onPayDone($order, $receipt);
             if ($result === true)
             {
                 $message = __('hanoivip.shop::pay.success');
@@ -303,7 +300,8 @@ class ShopV2 extends Controller
         }
         catch (Exception $ex)
         {
-            
+            Log::error("ShopV2 history exception: " . $ex->getMessage());
+            $error_message = __('hanoivip.shop::history.error');
         }
         return view('hanoivip::shopv2-history', [
             'records' => $records,

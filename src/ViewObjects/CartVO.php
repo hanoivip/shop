@@ -21,4 +21,21 @@ class CartVO
         $this->id = Str::random(6);
         $this->items = [];
     }
+    
+    public $delivery_type = null;
+    
+    public function appendItem($item)
+    {
+        if (empty($this->delivery_type))
+        {
+            $this->delivery_type = $item->delivery_type;
+        }
+        else
+        {
+            if ($this->delivery_type != $item->delivery_type)
+            {
+                throw new Exception("Cart multiple delivery type not support");
+            }
+        }
+    }
 }

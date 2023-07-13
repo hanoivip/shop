@@ -54,7 +54,7 @@ class SessionCart implements ICartService
             return __("hanoivip.shop::cart.full");
         }
         $itemRecord->count = 1;
-        $cart->items[] = $itemRecord;
+        $cart->appendItem($itemRecord);
         //save
         session()->put($key, $cart);
         return true;
