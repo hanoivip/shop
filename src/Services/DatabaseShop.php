@@ -4,6 +4,7 @@ namespace Hanoivip\Shop\Services;
 
 use Hanoivip\Shop\Models\Shop;
 use Hanoivip\Shop\Models\ShopItem;
+use Hanoivip\Shop\ViewObjects\ShopVO;
 
 class DatabaseShop implements IShopData
 {
@@ -46,5 +47,16 @@ class DatabaseShop implements IShopData
             })->first();
         }
     }
-    
+    /**
+     * 
+     * @param ShopVO $shop
+     */
+    public function newShop($shop)
+    {
+        $record = new Shop();
+        $record->name = $shop->name;
+        $record->slug = $shop->slug;
+        $record->conditions = json_encode($shop->conditions);
+        $record->save();
+    }
 }

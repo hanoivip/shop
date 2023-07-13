@@ -63,10 +63,10 @@ Route::middleware([
 ])->namespace('Hanoivip\Shop\Controllers')
     ->prefix('ecmin/shopv2')
     ->group(function () {
-        Route::get('/list/shop', 'Admin@listShop');
-        Route::get('/view/shop', 'Admin@viewShop');
-        Route::get('/list/order', 'Admin@listOrder');
+        Route::get('/list/shop', 'Admin@listShop')->name('ecmin.shopv2');
+        Route::get('/view/shop', 'Admin@viewShop')->name('ecmin.shopv2.open');
+        Route::get('/list/order', 'Admin@listOrder')->name('ecmin.shopv2.order');
         Route::get('/view/order', 'Admin@viewOrder');
-        Route::get('/new/shop', 'Admin@newShop');
-        Route::get('/new/item', 'Admin@newItem');
+        Route::any('/new/shop', 'Admin@newShop')->name('ecmin.shopv2.add');
+        Route::any('/new/item', 'Admin@newItem')->name('ecmin.shopv2.additem');
     });

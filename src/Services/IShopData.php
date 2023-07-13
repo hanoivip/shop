@@ -21,6 +21,9 @@ interface IShopData
      * @return \stdClass[]
      */
     public function getShopItems($shop, $items = null);
-    
-    public function newShop($name, $conditions);
+    /**
+     * 
+     * @param ShopVO $shop
+     */
+    public function newShop($shop);
 }

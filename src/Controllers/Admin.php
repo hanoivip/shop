@@ -11,9 +11,14 @@ class Admin extends Controller
 {
     private $shopData;
     
-    public function __construct(IShopData $shopData)
+    private $shopBusiness;
+    
+    public function __construct(
+        IShopData $shopData,
+        ShopService $shopBusiness)
     {
-        $this->shopData = $shopData;    
+        $this->shopData = $shopData;
+        $this->shopBusiness = $shopBusiness;
     }
     
     public function listShop(Request $request)
@@ -27,28 +32,29 @@ class Admin extends Controller
         {
             Log::error("ShopV2 admin list shop exception: " . $ex->getMessage());
         }
-        return view('hanoivip::shopv2-list', [
+        return view('hanoivip::admin.shopv2-list', [
             'shops' => $list
         ]);
     }
     
     public function viewShop(Request $request)
     {
-        $shop = $request->input('shop');//slug
+        $slug = $request->input('slug');//slug
         $items = [];
         $message = null;
         $error_message = null;
         try
         {
             $userId = Auth::user()->getAuthIdentifier();
-            $items = $this->shopData->getShopItems($shop);
+            $items = $this->shopData->getShopItems($slug);
         }
         catch (Exception $ex)
         {
             Log::error("ShopV2 admin open shop exception: " . $ex->getMessage());
             $error_message = __('hanoivip.shop::open.error');
         }
-        return view('hanoivip::shopv2-view', [
+        return view('hanoivip::admin.shopv2-view', [
+            'slug' => $slug,
             'items' => $items,
             'message' => $message,
             'error_message' => $error_message,
@@ -57,15 +63,27 @@ class Admin extends Controller
     
     public function listOrder(Request $request)
     {
+        $message = null;
+        $error_message = null;
+        $page = 0;
+        $records = [];
+        $tid = $request->input('tid');
         try
         {
-            $tid = $request->input('tid');
+            $records = $this->orderService->list($tid, $page);
         }
         catch (Exception $ex)
         {
-            Log::error("ShopV2 admin list shop exception: " . $ex->getMessage());
+            
         }
+        return view('hanoivip::shopv2-history', [
+            'records' => $records,
+            'message' => $message,
+            'error_message' => $error_message,
+        ]);
     }
+    
+    
     
     public function viewOrder(Request $request)
     {
@@ -85,12 +103,37 @@ class Admin extends Controller
         {
             if ($request->getMethod() == 'POST')
             {
-                
+                $message = null;
+                $error_message = null;
+                $result = $this->shopBusiness->newShop($request->all());
+                if ($result)
+                {
+                    $message = "success";
+                }
+                else
+                {
+                    $error_message = "failure";
+                }
+                return view('hanoivip::admin.result', [
+                    'message' => $message,
+                    'error_message' => $error_message,
+                ]);
             }
             else 
             {
-                return view('hanoivip::shopv2-new');
+                return view('hanoivip::admin.shopv2-new');
             }
+        }
+        catch (Exception $ex)
+        {
+        }
+    }
+    
+    public function delShop(Request $request)
+    {
+        try
+        {
+            
         }
         catch (Exception $ex)
         {
@@ -99,9 +142,31 @@ class Admin extends Controller
     
     public function newItem(Request $request)
     {
+        $slug = $request->input('slug');
         try
         {
-            $tid = $request->input('tid');
+            if ($request->getMethod() == 'POST')
+            {
+                $message = null;
+                $error_message = null;
+                $result = $this->shopBusiness->newShopItem($slug, $request->all());
+                if ($result)
+                {
+                    $message = "success";
+                }
+                else
+                {
+                    $error_message = "failure";
+                }
+                return view('hanoivip::admin.result', [
+                    'message' => $message,
+                    'error_message' => $error_message,
+                ]);
+            }
+            else
+            {
+                return view('hanoivip::admin.shopv2-new-item', ['slug' => $slug]);
+            }
         }
         catch (Exception $ex)
         {

@@ -8,6 +8,9 @@ use Hanoivip\Shop\Models\ShopOrder;
 use Hanoivip\GateClient\Facades\BalanceFacade;
 use Hanoivip\Game\Facades\GameHelper;
 use Exception;
+use Hanoivip\Shop\ViewObjects\ShopVO;
+use Hanoivip\Shop\Models\ShopItem;
+use Illuminate\Support\Str;
 
 class ShopService
 {
@@ -206,9 +209,66 @@ class ShopService
         $order->save();
         return true;
     }*/
-    public function newShop($name, $conditions)
+    public function newShop($data)
     {
-        return $this->shopData->newShop($name, $conditions);
+        $name = $data['name'];
+        $shop = new ShopVO($name);
+        if (!empty($data['starttime']) && !empty($data['endtime']))
+        {
+            $condition = new \stdClass();
+            $condition->type = 'AfterTime';
+            $condition->value = intval($data['starttime']);
+            $shop->conditions[] = $condition;
+            $condition1 = new \stdClass();
+            $condition1->type = 'BeforeTime';
+            $condition1->value = intval($data['endtime']);
+            $shop->conditions[] = $condition1;
+        }
+        if (!empty($data['viplv']))
+        {
+            $condition = new \stdClass();
+            $condition->type = 'VipLevel';
+            $condition->value = intval($data['viplv']);
+            $shop->conditions[] = $condition;
+        }
+        return $this->shopData->newShop($shop);
     }
     
+    public function newShopItem($slug, $data)
+    {
+        Log::debug(print_r($data, true));
+        $shop = $this->shopData->allShop($slug);
+        if (empty($shop))
+        {
+            throw new Exception("Shopv2 shop $shop invalid");
+        }
+        $code = $data['code'];
+        $shopItem = $this->shopData->getShopItems($slug, $code);
+        if (!empty($shopItem))
+        {
+            return __('hanoivip.shop::item.code-duplicated');
+        }
+        $item = new ShopItem();
+        $item->shop_id = $shop->id;
+        $item->title = $data['title'];
+        $item->code = $code;
+        $item->origin_price = $data['origin_price'];
+        $item->price = $data['price'];
+        $item->currency = $data['currency'];
+        $images = [];
+        if(!empty($data['images']))
+        {
+            foreach($data['images'] as $file)
+            {
+                $name = Str::random().'.'.$file->extension();
+                $file->move(public_path('img'), $name);
+                $images[] = '/img/'.$name;
+            }
+        }
+        $item->images = json_encode($images);
+        $item->description = $data['description'];
+        $item->delivery_type = $data['delivery_type'];
+        $item->save();
+        return true;
+    }
 }
