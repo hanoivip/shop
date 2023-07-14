@@ -28,7 +28,7 @@ class SessionCart implements ICartService
         $key = "ShopCart@" . $userId;
         if (!session()->has($key))
         {
-            $cart = new CartVO($shop);
+            $cart = new CartVO($userId, $shop);
             session()->put($cart->id, $key);
         }
         else
@@ -108,7 +108,11 @@ class SessionCart implements ICartService
             }
         }
     }
-    
+    /**
+     * 
+     * {@inheritDoc}
+     * @see \Hanoivip\Shop\Services\ICartService::getUserCart()
+     */
     public function getUserCart($userId)
     {
         $key = "ShopCart@" . $userId;
@@ -127,6 +131,17 @@ class SessionCart implements ICartService
             $key = "ShopCart@" . $userId;
             session()->put($cart->id, null);
             session()->put($key, null);
+        }
+    }
+    
+    public function setDeliveryInfo($cart, $info)
+    {
+        $key = session()->get($cart, null);
+        if (!empty($key))
+        {
+            $record = session()->get($key, null);
+            $record->delivery_info = $info;
+            session()->put($key, $record);
         }
     }
 }

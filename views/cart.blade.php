@@ -2,6 +2,10 @@
 
 @section('title', 'Cart detail')
 
+@push('scripts')
+    <script src="/js/recharge3.js"></script>
+@endpush
+
 @section('content')
 
 @if (!empty($cart->items))
@@ -20,8 +24,16 @@
 	@endforeach
 	<form method="post" action="{{route('shopv2.order')}}">
 		{{ csrf_field() }}
+		{{-- delivery infomation --}}
 		<input type="hidden" id="cart" name="cart" value="{{$cart->id}}" />
 		@if ($cart->delivery_type == 1 || $cart->delivery_type == 2)
+			<select id="recharge-svname" name="svname" style="width: 100%;" data-action="{{ route('game.roles') }}" 
+				data-update-id="recharge-roles-div">
+        		{{ show_user_servers() }}
+        	</select>
+        	<div id="recharge-roles-div">
+        	</div>
+        	<a data-action="{{ route('game.roles') }}" id="recharge-refresh-roles" data-update-id="recharge-roles-div">Làm mới ds nhân vật</a>
 		@endif
 		<button type="submit">Order</button>
 	</form>

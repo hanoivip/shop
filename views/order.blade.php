@@ -16,6 +16,10 @@
 		<p>Item origin price: {{ $item->origin_price }}</p>
 		<p>Item current price: {{ $item->price }}</p>
 	@endforeach
+	@if (!empty($order->cart->delivery_info))
+		<p>---------------</p>
+		{{ print_r($order->cart->delivery_info, true) }}
+	@endif
 	<p>---------------</p>
 	<p>Order origin price: {{ $order->origin_price }} {{ $order->currency }}</p>
 	<p>Order price: {{ $order->price }} {{ $order->currency }}</p> 

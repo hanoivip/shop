@@ -195,6 +195,16 @@ class ShopV2 extends Controller
         {
             $userId = Auth::user()->getAuthIdentifier();
             $record = $this->cartBusiness->getDetail($cart);
+            if ($record->delivery_type == 1 || $record->delivery_type == 2)
+            {
+                $svname = $request->input('svname');
+                $roleid = $request->input('roleid');
+                // TODO: validate ?
+                $info = new \stdClass();
+                $info->svname = $svname;
+                $info->roleid = $roleid;
+                $this->cartBusiness->setDeliveryInfo($cart, $info);
+            }
             $result = $this->orderService->order($userId, $record);
             if (gettype($result) == 'string')
             {

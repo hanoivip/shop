@@ -3,6 +3,12 @@ namespace Hanoivip\Shop\ViewObjects;
 
 class ItemVO
 {
+    const ROLE_CURRENCIES = 1;
+    const ROLE_ITEMS = 2;
+    const WEB_ACCOUNT = 3;
+    const GAME_ACCOUNT = 4;
+    const XGAME_ACC = 5;// change game account..
+    
     public $code;
     
     public $name;

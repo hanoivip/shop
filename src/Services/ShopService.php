@@ -11,17 +11,10 @@ use Exception;
 use Hanoivip\Shop\ViewObjects\ShopVO;
 use Hanoivip\Shop\Models\ShopItem;
 use Illuminate\Support\Str;
+use Hanoivip\Shop\Jobs\SendShopOrderJob;
 
 class ShopService
-{
-    const UNPAID = 0;
-    //const CANCEL = 1;
-    const PAID = 2;
-    
-    const UNSENT = 0;
-    const SENDING = 1;
-    const SENT = 2;
-    
+{   
     protected $shopData;
     
     protected $orderService;
@@ -156,13 +149,13 @@ class ShopService
         {
             return __('hanoivip.shop::receipt.failure');
         }
-        if ($oderRec->payment_status == self::UNPAID)
+        if ($oderRec->payment_status == OrderService::UNPAID)
         {
-            $orderRec->payment_status = self::PAID;
+            $orderRec->payment_status = OrderService::PAID;
         }
-        if ($orderRec->delivery_status == self::UNSENT)
+        if ($orderRec->delivery_status == OrderService::UNSENT)
         {
-            $orderRec->payment_status = self::SENDING;
+            $orderRec->payment_status = OrderService::SENDING;
             dispatch(new SendShopOrderJob($order));
         }
         $orderRec->save();

@@ -13,6 +13,11 @@ class Shop extends Model
         return json_decode($value);
     }
     
+    public function getCartAttribute($value)
+    {
+        return json_decode($value);
+    }
+    
     public function items(): HasMany
     {
         return $this->hasMany(ShopItem::class);

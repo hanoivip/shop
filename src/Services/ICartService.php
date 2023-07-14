@@ -15,14 +15,21 @@ interface ICartService
     public function removeFromCart($userId, $itemId);
     /**
      * Get cart by cart ID
-     * @param string $cart
+     * @param CartVO $cart
      */
     public function getDetail($cart);
     /**
      * Get cart by user
      * @param number $userId
+     * @return CartVO
      */
     public function getUserCart($userId);
-    
+    /**
+     * Empty this cart
+     * @param number $userId
+     * @return boolean
+     */
     public function emptyCart($userId);
+    
+    public function setDeliveryInfo($cart, $info);
 }

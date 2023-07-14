@@ -6,21 +6,15 @@ use Hanoivip\Shop\Models\ShopOrder;
 use Illuminate\Support\Str;
 
 class OrderService
-{
+{   
     const UNPAID = 0;
-    const CANCEL = 1;
+    //const CANCEL = 1;
     const PAID = 2;
     
     const UNSENT = 0;
-    const SENDFAIL = 1;
+    const SENDING = 1;
     const SENT = 2;
-    
-    private $shop;
-    
-    public function __construct(ShopService $shop)
-    {
-        $this->shop = $shop;
-    }
+    const SENDFAIL = 3;
     /**
      * 
      * @param CartVO $cart
@@ -54,6 +48,7 @@ class OrderService
     
     /**
      * Order by cart
+     * @param number $userId
      * @param CartVO $cart
      * @return ShopOrder
      */
