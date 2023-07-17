@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Hanoivip\Shop\Services\IShopData;
 use Hanoivip\Shop\Services\ShopService;
+use Hanoivip\Shop\Services\OrderService;
+use Hanoivip\Shop\Jobs\SendShopOrderJob;
 
 class Admin extends Controller
 {
@@ -13,12 +15,16 @@ class Admin extends Controller
     
     private $shopBusiness;
     
+    private $orderService;
+    
     public function __construct(
         IShopData $shopData,
-        ShopService $shopBusiness)
+        ShopService $shopBusiness,
+        OrderService $orderService)
     {
         $this->shopData = $shopData;
         $this->shopBusiness = $shopBusiness;
+        $this->orderService = $orderService;
     }
     
     public function listShop(Request $request)
@@ -74,27 +80,70 @@ class Admin extends Controller
         }
         catch (Exception $ex)
         {
-            
+            Log::error("ShopV2 admin list order exception: " . $ex->getMessage());
+            $error_message = __('hanoivip.shop::order.list.error');
         }
-        return view('hanoivip::shopv2-history', [
-            'records' => $records,
+        return view('hanoivip::admin.shopv2-order-list', [
+            'orders' => $records,
             'message' => $message,
             'error_message' => $error_message,
         ]);
     }
     
-    
-    
     public function viewOrder(Request $request)
     {
+        $message = null;
+        $error_message = null;
+        $orderRec = null;
         try
         {
             $order = $request->input('order');
+            $orderRec = $this->orderService->detail($order);
+            if (empty($orderRec))
+            {
+                $error_message = __('hanoivip.shop::order.invalid');
+            }
         }
         catch (Exception $ex)
         {
             Log::error("ShopV2 admin list shop exception: " . $ex->getMessage());
+            $error_message = __('hanoivip.shop::order.view.error');
         }
+        return view('hanoivip::admin.shopv2-order-view', [
+            'message' => $message,
+            'error_message' => $error_message,
+            'order' => $orderRec
+        ]);
+    }
+    
+    public function finishOrder(Request $request)
+    {
+        $message = null;
+        $error_message = null;
+        try
+        {
+            $order = $request->input('order');
+            $orderRec = $this->orderService->detail($order);
+            if (empty($orderRec))
+            {
+                $error_message = __('hanoivip.shop::order.invalid');
+            }
+            else
+            {
+                $orderRec->payment_status = OrderService::SENDING;
+                dispatch(new SendShopOrderJob($order, "AdminFlow"));
+                $message = "success";
+            }
+        }
+        catch (Exception $ex)
+        {
+            Log::error("ShopV2 admin finish order exception: " . $ex->getMessage());
+            $error_message = __('hanoivip.shop::order.finish.exception');
+        }
+        return view('hanoivip::admin.result', [
+            'message' => $message,
+            'error_message' => $error_message,
+        ]);
     }
     
     public function newShop(Request $request)

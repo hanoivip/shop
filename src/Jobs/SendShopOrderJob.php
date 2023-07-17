@@ -22,9 +22,12 @@ class SendShopOrderJob implements ShouldQueue
     
     private $order;
     
-    public function __construct($order)
+    private $reason;
+    
+    public function __construct($order, $reason)
     {
         $this->order = $order;
+        $this->reason = $reason;
     }
     
     public function handle()
@@ -33,12 +36,13 @@ class SendShopOrderJob implements ShouldQueue
             $record = ShopOrder::where('serial', $order)->first();
             if (!empty($record))
             {
-                if ($record->payment_status == OrderService::UNPAID)
+                /*if ($record->payment_status == OrderService::UNPAID)
                 {
                     Log::error("Why unpaid order pass here? $this->order");
                 }
                 if ($record->payment_status == OrderService::PAID &&
-                    $record->delivery_status == OrderService::SENDING)
+                    $record->delivery_status == OrderService::SENDING)*/
+                if ($record->delivery_status == OrderService::SENDING)
                 {
                     $sent = true;
                     /** @var CartVO $cart */
@@ -74,6 +78,7 @@ class SendShopOrderJob implements ShouldQueue
                     if ($sent)
                     {
                         $record->delivery_status = OrderService::SENT;
+                        $record->delivery_reason = $this->reason;
                         $record->save();
                     }
                     else

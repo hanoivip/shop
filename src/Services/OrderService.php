@@ -80,4 +80,9 @@ class OrderService
     {
         return ShopOrder::where('serial', $order)->first();
     }
+    
+    public function list($userId, $page = 0)
+    {
+        
+    }
 }
