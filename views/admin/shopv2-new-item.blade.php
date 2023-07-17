@@ -22,6 +22,7 @@
 						<option value="2">Game role item bag</option>
 						<option value="3">Web account</option>
 						<option value="4">Game account</option>
+						<option value="5">Exchange account</option>
 					</select>
 	<button type="submit">Add</button>
 </form>

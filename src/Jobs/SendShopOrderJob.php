@@ -12,6 +12,7 @@ use Hanoivip\Shop\Services\OrderService;
 use Hanoivip\Shop\Models\ShopOrder;
 use Hanoivip\Shop\ViewObjects\CartVO;
 use Hanoivip\Shop\ViewObjects\ItemVO;
+use Hanoivip\Game\Services\GameHelper;
 
 class SendShopOrderJob implements ShouldQueue
 {
@@ -32,13 +33,14 @@ class SendShopOrderJob implements ShouldQueue
             $record = ShopOrder::where('serial', $order)->first();
             if (!empty($record))
             {
-                if ($record->payment_status != OrderService::UNPAID)
+                if ($record->payment_status == OrderService::UNPAID)
                 {
                     Log::error("Why unpaid order pass here? $this->order");
                 }
                 if ($record->payment_status == OrderService::PAID &&
                     $record->delivery_status == OrderService::SENDING)
                 {
+                    $sent = true;
                     /** @var CartVO $cart */
                     $cart = $record->cart;
                     switch ($cart->delivery_type)
@@ -48,7 +50,7 @@ class SendShopOrderJob implements ShouldQueue
                             foreach ($cart->items as $item)
                             {
                                 /** @var ItemVO $item */
-                                GameHelper::recharge($cart->userId, $cart->delivery_info->svname, $item->code, $item->count, $cart->delivery_info->roleid);
+                                $sent = $sent && GameHelper::recharge($cart->userId, $cart->delivery_info->svname, $item->code, $item->count, $cart->delivery_info->roleid);
                             }
                             break;
                         case ItemVO::ROLE_ITEMS:
@@ -56,7 +58,7 @@ class SendShopOrderJob implements ShouldQueue
                             foreach ($cart->items as $item)
                             {
                                 /** @var ItemVO $item */
-                                GameHelper::sendItem($cart->userId, $cart->delivery_info->svname, $item->code, $item->count, $cart->delivery_info->roleid);
+                                $sent = $sent && GameHelper::sendItem($cart->userId, $cart->delivery_info->svname, $item->code, $item->count, $cart->delivery_info->roleid);
                             }
                             break;
                         case ItemVO::WEB_ACCOUNT:
@@ -64,6 +66,20 @@ class SendShopOrderJob implements ShouldQueue
                             break;
                         case ItemVO::GAME_ACCOUNT:
                             break;
+                        case ItemVO::XGAME_ACC:
+                            // buy account, transfer account, exchange account
+                            $sent = $sent && GameHelper::transferAccount($item->code, $cart->userId);
+                            break;
+                    }
+                    if ($sent)
+                    {
+                        $record->delivery_status = OrderService::SENT;
+                        $record->save();
+                    }
+                    else
+                    {
+                        // retry after 1 minutes
+                        $this->release(60);
                     }
                 }
             }
