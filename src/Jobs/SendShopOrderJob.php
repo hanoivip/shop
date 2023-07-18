@@ -12,7 +12,7 @@ use Hanoivip\Shop\Services\OrderService;
 use Hanoivip\Shop\Models\ShopOrder;
 use Hanoivip\Shop\ViewObjects\CartVO;
 use Hanoivip\Shop\ViewObjects\ItemVO;
-use Hanoivip\Game\Services\GameHelper;
+use Hanoivip\Game\Facades\GameHelper;
 
 class SendShopOrderJob implements ShouldQueue
 {
@@ -33,7 +33,7 @@ class SendShopOrderJob implements ShouldQueue
     public function handle()
     {
         Redis::funnel('SendShopOrderJob@' . $this->order)->limit(1)->then(function () {
-            $record = ShopOrder::where('serial', $order)->first();
+            $record = ShopOrder::where('serial', $this->order)->first();
             if (!empty($record))
             {
                 /*if ($record->payment_status == OrderService::UNPAID)
@@ -47,6 +47,7 @@ class SendShopOrderJob implements ShouldQueue
                     $sent = true;
                     /** @var CartVO $cart */
                     $cart = $record->cart;
+                    //print_r($cart);
                     switch ($cart->delivery_type)
                     {
                         case ItemVO::ROLE_CURRENCIES:
@@ -54,7 +55,7 @@ class SendShopOrderJob implements ShouldQueue
                             foreach ($cart->items as $item)
                             {
                                 /** @var ItemVO $item */
-                                $sent = $sent && GameHelper::recharge($cart->userId, $cart->delivery_info->svname, $item->code, $item->count, $cart->delivery_info->roleid);
+                                $sent = $sent && GameHelper::recharge($cart->userId, $cart->delivery_info->svname, $item->code, $cart->delivery_info->roleid);
                             }
                             break;
                         case ItemVO::ROLE_ITEMS:

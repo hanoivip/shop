@@ -26,7 +26,7 @@ class ModShopItems extends Migration
             $table->dropColumn('currency');
             $table->dropColumn('delivery_type');
             $table->dropColumn('description');
-            $table->text('limit')->string()->default('[]');
+            $table->text('limit')->string()->nullable()->change();
             $table->integer('price_type');
             $table->string('image');
         });

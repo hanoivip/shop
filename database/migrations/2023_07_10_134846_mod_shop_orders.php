@@ -21,7 +21,7 @@ class ModShopOrders extends Migration
             $table->text('cart')->nullable()->comment('cart detail');
             $table->integer('payment_status');
             $table->integer('delivery_status');
-            $table->string('delivery_reason');
+            $table->string('delivery_reason')->nullable();
             $table->string('currency');
         });
     }

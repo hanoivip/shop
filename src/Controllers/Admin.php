@@ -130,7 +130,8 @@ class Admin extends Controller
             }
             else
             {
-                $orderRec->payment_status = OrderService::SENDING;
+                $orderRec->delivery_status = OrderService::SENDING;
+                $orderRec->save();
                 dispatch(new SendShopOrderJob($order, "AdminFlow"));
                 $message = "success";
             }

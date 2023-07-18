@@ -81,8 +81,11 @@ class OrderService
         return ShopOrder::where('serial', $order)->first();
     }
     
-    public function list($userId, $page = 0)
+    public function list($userId, $page = 0, $count = 10)
     {
-        
+        return ShopOrder::where('user_id', $userId)
+        ->skip($page * $count)
+        ->take($count)
+        ->get();
     }
 }
