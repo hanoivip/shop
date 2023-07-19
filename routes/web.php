@@ -13,7 +13,7 @@ Route::middleware([
     // Open shop, param: shop ID
     Route::get('/open', 'ShopV2@open')->name('shopv2');
     // Cart, max item number is configurable
-    Route::post('/cart/remove', 'ShopV2@removeFromCart')->name('shopv2.cart.remove');
+    Route::any('/cart/remove', 'ShopV2@removeFromCart')->name('shopv2.cart.remove');
     Route::post('/cart/add', 'ShopV2@addToCart')->name('shopv2.cart.add');
     Route::get('/cart', 'ShopV2@viewCart')->name('shopv2.cart');
     // Order

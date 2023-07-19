@@ -112,7 +112,7 @@ class ShopV2 extends Controller
     
     public function removeFromCart(Request $request)
     {
-        $shop = $request->input('shop');
+        //$shop = $request->input('shop');
         $item = $request->input('item');
         $message = null;
         $error_message = null;
