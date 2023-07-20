@@ -4,6 +4,9 @@ namespace Hanoivip\Shop\Services;
 use Hanoivip\Shop\ViewObjects\CartVO;
 use Hanoivip\Shop\Models\ShopOrder;
 use Illuminate\Support\Str;
+use Hanoivip\User\Facades\UserFacade;
+use Illuminate\Support\Facades\Notification;
+use Hanoivip\Shop\Notifications\NewOrder;
 
 class OrderService
 {   
@@ -59,8 +62,9 @@ class OrderService
             return __('hanoivip.shop::order.cart-is-empty');
         }
         $price = $this->calculatePrice($cart);
+        // save db
         $order = new ShopOrder();
-        $order->serial = Str::random(8);
+        $order->serial = $serial = Str::random(8);
         $order->user_id = $userId;
         $order->cart = json_encode($cart);
         $order->price = $price->price;
@@ -69,6 +73,8 @@ class OrderService
         $order->payment_status = self::UNPAID;
         $order->delivery_status = self::UNSENT;
         $order->save();
+        $user = UserFacade::getUserCredentials($userId);
+        Notification::send($user, new NewOrder($serial, $cart));
         return $order;
     }
     /**
@@ -87,5 +93,15 @@ class OrderService
         ->skip($page * $count)
         ->take($count)
         ->get();
+    }
+    /**
+     * 
+     * @param string $order
+     * @return boolean
+     */
+    public function isValid($order)
+    {
+        $record = $this->detail($order);
+        return !empty($record);
     }
 }

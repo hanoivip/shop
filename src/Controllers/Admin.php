@@ -8,6 +8,9 @@ use Hanoivip\Shop\Services\IShopData;
 use Hanoivip\Shop\Services\ShopService;
 use Hanoivip\Shop\Services\OrderService;
 use Hanoivip\Shop\Jobs\SendShopOrderJob;
+use Illuminate\Support\Facades\Notification;
+use Hanoivip\User\Facades\UserFacade;
+use Hanoivip\Shop\Notifications\NewOrder;
 
 class Admin extends Controller
 {
@@ -188,6 +191,34 @@ class Admin extends Controller
         catch (Exception $ex)
         {
         }
+    }
+    
+    public function emailOrder(Request $request)
+    {
+        $message = null;
+        $error_message = null;
+        try
+        {
+            $order = $request->input('order');
+            if ($this->orderService->isValid($order))
+            {
+                $record = $this->orderService->detail($order);
+                $user = UserFacade::getUserCredentials($record->user_id);
+                Notification::send($user, new NewOrder($record->serial, $record->cart));
+                $message = "success";
+            }
+            else
+            {
+                $error_message = "invalid order";
+            }
+        }
+        catch (Exception $ex)
+        {
+        }
+        return view('hanoivip::admin.result', [
+            'message' => $message,
+            'error_message' => $error_message,
+        ]);
     }
     
     public function newItem(Request $request)

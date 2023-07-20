@@ -86,8 +86,10 @@ class ShopV2 extends Controller
         $item = $request->input('item');
         $message = null;
         $error_message = null;
+        $items = [];
         try
         {
+            $items = $this->shopBusiness->getShopItems($shop);
             $userId = Auth::user()->getAuthIdentifier();
             $result = $this->cartBusiness->addToCart($userId, $shop, $item);
             if ($result === true)
@@ -104,7 +106,8 @@ class ShopV2 extends Controller
             Log::error("ShopV2 add to cart exception: " . $ex->getMessage());
             $error_message = __('hanoivip.shop::cart.add.error');
         }
-        return view('hanoivip::shop-result', [
+        return view('hanoivip::shopv2-view', [
+            'items' => $items,
             'message' => $message,
             'error_message' => $error_message,
         ]); 
@@ -116,8 +119,10 @@ class ShopV2 extends Controller
         $item = $request->input('item');
         $message = null;
         $error_message = null;
+        $record = null;
         try
         {
+            $record = $this->cartBusiness->getUserCart($userId);
             $userId = Auth::user()->getAuthIdentifier();
             $result = $this->cartBusiness->removeFromCart($userId, $item);
             if ($result === true)
@@ -134,7 +139,8 @@ class ShopV2 extends Controller
             Log::error("ShopV2 remove from cart exception: " . $ex->getMessage());
             $error_message = __('hanoivip.shop::cart.remove.error');
         }
-        return view('hanoivip::shop-result', [
+        return view('hanoivip::cart', [
+            'cart' => $record,
             'message' => $message,
             'error_message' => $error_message,
         ]); 

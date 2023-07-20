@@ -9,6 +9,7 @@
 @else
     <table>
     	<tr>
+    		<th>Time</th>
     		<th>Serial</th>
     		<th>Price</th>
     		<th>Payment</th>
@@ -18,6 +19,7 @@
     	</tr>
     @foreach ($orders as $order)
     	<tr>
+    		<td>{{ $order->created_at }}</td>
     		<td>{{ $order->serial }}</td>
     		<td>{{ $order->price }} {{ $order->currency }}</td>
     		<td>{{ __('hanoivip.shop::order.payment_status.' . $order->payment_status) }}</td>
