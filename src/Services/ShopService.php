@@ -132,9 +132,9 @@ class ShopService
      * @param array|string $items Item code or Array of item codes
      * @return \stdClass[]|\stdClass
      */
-    public function getShopItems($shop, $items = null)
+    public function getShopItems($shop, $items = null, $orderType = null, $order = null)
     { 
-        return $this->shopData->getShopItems($shop, $items);
+        return $this->shopData->getShopItems($shop, $items, $orderType, $order);
     }
     
     public function onPayDone($order, $receipt)

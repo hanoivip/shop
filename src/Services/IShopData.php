@@ -18,9 +18,10 @@ interface IShopData
      * Get shop items
      * @param string $shop Shop Slug
      * @param string|array $items
+     * @param string $order
      * @return \stdClass[]
      */
-    public function getShopItems($shop, $items = null);
+    public function getShopItems($shop, $items = null, $order = null);
     /**
      * 
      * @param ShopVO $shop

@@ -16,6 +16,7 @@ class ModShopItems extends Migration
             $table->string('currency')->default('VND');
             $table->integer('delivery_type')->default(0)->comment('Delivery type: game role items, game role currency, game account..');
             $table->text('description')->nullable();
+            $table->text('meta')->nullable();
         });
     }
 
@@ -26,6 +27,7 @@ class ModShopItems extends Migration
             $table->dropColumn('currency');
             $table->dropColumn('delivery_type');
             $table->dropColumn('description');
+            $table->dropColumn('meta');
             $table->text('limit')->string()->nullable()->change();
             $table->integer('price_type');
             $table->string('image');

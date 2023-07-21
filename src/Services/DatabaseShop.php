@@ -24,14 +24,25 @@ class DatabaseShop implements IShopData
         }
     }
     
-    public function getShopItems($shop, $items = null)
+    public function getShopItems($shop, $items = null, $orderType = null, $order = null)
     {
         if (empty($items))
         {
-            $shopRecord = Shop::where('slug', $shop)->first();
-            if (!empty($shopRecord))
+            if (!empty($orderType) && !empty($order))
             {
-                return $shopRecord->items;
+                return ShopItem::where('shop_id', function ($query) use ($shop) {
+                    $query->select('id')->from('shops')->where('slug', $shop)->first();
+                })
+                ->orderBy($orderType, $order)
+                ->get();
+            }
+            else 
+            {
+                $shopRecord = Shop::where('slug', $shop)->first();
+                if (!empty($shopRecord))
+                {
+                    return $shopRecord->items;
+                }
             }
         }
         else if (gettype($items) == 'array')

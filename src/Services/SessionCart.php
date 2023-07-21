@@ -122,7 +122,7 @@ class SessionCart implements ICartService
         }
     }
     
-    public function emptyCart($userId)
+    public function empty($userId)
     {
         $cart = $this->getUserCart($userId);
         if (!empty($cart))
@@ -143,5 +143,16 @@ class SessionCart implements ICartService
             $record->delivery_info = $info;
             session()->put($key, $record);
         }
+    }
+    
+    public function isEmpty($userId)
+    {
+        $key = "ShopCart@" . $userId;
+        $cart = null;
+        if (session()->has($key))
+        {
+            $cart = session()->get($key, null);
+        }
+        return empty($cart);
     }
 }

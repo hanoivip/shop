@@ -29,7 +29,9 @@ interface ICartService
      * @param number $userId
      * @return boolean
      */
-    public function emptyCart($userId);
+    public function empty($userId);
     
     public function setDeliveryInfo($cart, $info);
+    
+    public function isEmpty($userId);
 }

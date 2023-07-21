@@ -52,16 +52,24 @@ class ShopV2 extends Controller
     public function open(Request $request)
     {
         $shop = $request->input('shop');//slug
+        $orderType = $request->input('sort_type');//price? meta?
+        $order = $request->input('sort');
+        $meta = $request->input('is_meta');
+        if (!empty($meta) && !empty($orderType))
+        {
+            $orderType = "meta->$orderType";
+        }
         $items = [];
         $message = null;
         $error_message = null;
+        $view = view()->exists("hanoivip::shopv2-$shop-view") ? "hanoivip::shopv2-$shop-view" : "hanoivip::shopv2-view";
         try
         {
             $userId = Auth::user()->getAuthIdentifier();
             if ($this->shopBusiness->canOpen($userId, $shop))
             {
                 //TODO: user dedicated shop items?
-                $items = $this->shopBusiness->getShopItems($shop);
+                $items = $this->shopBusiness->getShopItems($shop, null, $orderType, $order);
             }
             else
             {
@@ -73,7 +81,8 @@ class ShopV2 extends Controller
             Log::error("ShopV2 open shop exception: " . $ex->getMessage());
             $error_message = __('hanoivip.shop::open.error');
         }
-        return view('hanoivip::shopv2-view', [
+        return view($view, [
+            'shop' => $shop,
             'items' => $items,
             'message' => $message,
             'error_message' => $error_message,
@@ -178,7 +187,7 @@ class ShopV2 extends Controller
         try
         {
             $userId = Auth::user()->getAuthIdentifier();
-            $this->cartBusiness->emptyCart($userId);
+            $this->cartBusiness->empty($userId);
             $message = __('hanoivip.shop::cart.drop.success');
         }
         catch (Exception $ex)
@@ -186,10 +195,7 @@ class ShopV2 extends Controller
             Log::error("ShopV2 drop cart exception: " . $ex->getMessage());
             $error_message = __('hanoivip.shop::cart.drop.error');
         }
-        return view('hanoivip::cart', [
-            'message' => $message,
-            'error_message' => $error_message,
-        ]);
+        return response()->redirectToRoute('shopv2');
     }
     
     public function order(Request $request)

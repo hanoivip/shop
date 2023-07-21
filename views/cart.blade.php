@@ -37,11 +37,7 @@
 		@endif
 		<button type="submit">Order</button>
 	</form>
-	<form method="post" action="{{route('shopv2.cart.drop')}}">
-		{{ csrf_field() }}
-		<input type="hidden" id="cart" name="cart" value="{{$cart->id}}" />
-		<button type="submit">Drop</button>
-	</form>
+	<a href="{{route('shopv2.cart.drop')}}">Drop</a>
 @else
 	<p>Cart is empty!</p>
 @endif

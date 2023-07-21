@@ -11,7 +11,7 @@ Route::middleware([
     // Test
     Route::get('/list', 'ShopV2@list');
     // Open shop, param: shop ID
-    Route::get('/open', 'ShopV2@open')->name('shopv2');
+    Route::any('/open', 'ShopV2@open')->name('shopv2');
     // Cart, max item number is configurable
     Route::any('/cart/remove', 'ShopV2@removeFromCart')->name('shopv2.cart.remove');
     Route::post('/cart/add', 'ShopV2@addToCart')->name('shopv2.cart.add');
@@ -21,7 +21,7 @@ Route::middleware([
     Route::get('/order/{order}', 'ShopV2@viewOrder')->name('shopv2.order.view');
     // Payment
     Route::get('/pay/{order}', 'ShopV2@pay')->name('shopv2.pay');
-    Route::post('/order/drop', 'ShopV2@dropCart')->name('shopv2.cart.drop');
+    Route::any('/order-drop', 'ShopV2@dropCart')->name('shopv2.cart.drop');
     // History
     Route::get('/history', 'ShopV2@listOrder')->name('shopv2.history');
 });
