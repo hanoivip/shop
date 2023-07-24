@@ -23,7 +23,7 @@ Route::middleware([
     Route::get('/pay/{order}', 'ShopV2@pay')->name('shopv2.pay');
     Route::any('/order-drop', 'ShopV2@dropCart')->name('shopv2.cart.drop');
     // History
-    Route::get('/history', 'ShopV2@listOrder')->name('shopv2.history');
+    Route::get('/history', 'ShopV2@history')->name('shopv2.history');
 });
 
 Route::middleware([

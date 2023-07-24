@@ -203,6 +203,7 @@ class ShopV2 extends Controller
         $cart = $request->input('cart');
         $message = null;
         $error_message = null;
+        $serial = null;
         try
         {
             $userId = Auth::user()->getAuthIdentifier();
@@ -224,7 +225,8 @@ class ShopV2 extends Controller
             }
             else
             {
-                $this->cartBusiness->emptyCart($userId);
+                $this->cartBusiness->empty($userId);
+                $serial = $result->serial;
                 $message = __('hanoivip.shop::cart.order.success');
             }
         }
@@ -233,7 +235,8 @@ class ShopV2 extends Controller
             Log::error("ShopV2 order exception: " . $ex->getMessage());
             $error_message = __('hanoivip.shop::cart.order.error');
         }
-        return view('hanoivip::shop-result', [
+        return view('hanoivip::shopv2-order-result', [
+            'serial' => $serial,
             'message' => $message,
             'error_message' => $error_message,
         ]); 

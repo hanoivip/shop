@@ -149,7 +149,7 @@ class ShopService
         {
             return __('hanoivip.shop::receipt.failure');
         }
-        if ($oderRec->payment_status == OrderService::UNPAID)
+        if ($orderRec->payment_status == OrderService::UNPAID)
         {
             $orderRec->payment_status = OrderService::PAID;
         }
