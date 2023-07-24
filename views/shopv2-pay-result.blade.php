@@ -4,6 +4,6 @@
 
 @section('content')
 
-
+<a href="{{ route('shopv2.history') }}">Shopping history</a>
 
 @endsection
