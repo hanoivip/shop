@@ -131,6 +131,7 @@ class ShopV2 extends Controller
         $record = null;
         try
         {
+            $userId = Auth::user()->getAuthIdentifier();
             $record = $this->cartBusiness->getUserCart($userId);
             $userId = Auth::user()->getAuthIdentifier();
             $result = $this->cartBusiness->removeFromCart($userId, $item);
@@ -306,7 +307,7 @@ class ShopV2 extends Controller
             Log::error("ShopV2 pay callback exception: " . $ex->getMessage());
             $error_message = __('hanoivip.shop::pay.error');
         }
-        return view('hanoivip::shop-result', [
+        return view('hanoivip::shopv2-pay-result', [
             'message' => $message,
             'error_message' => $error_message,
         ]);

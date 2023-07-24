@@ -155,7 +155,7 @@ class ShopService
         }
         if ($orderRec->delivery_status == OrderService::UNSENT)
         {
-            $orderRec->payment_status = OrderService::SENDING;
+            $orderRec->delivery_status = OrderService::SENDING;
             dispatch(new SendShopOrderJob($order, "PaymentFlow"));
         }
         $orderRec->save();
