@@ -18,4 +18,9 @@ class ShopItem extends Model
     {
         return $this->belongsTo(Shop::class);
     }
+    
+    public function getMetaAttribute($value)
+    {
+        return json_decode($value);
+    }
 }

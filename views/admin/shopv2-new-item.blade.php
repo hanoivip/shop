@@ -10,6 +10,7 @@ function addAttr()
 	var name = document.getElementById('attr_name').value;
 	var value =  document.getElementById('attr_value').value;
 	attrs[name] = value;
+	// render for fun
 	document.getElementById('attributes').innerHTML = JSON.stringify(attrs); 
 }
 function preSubmit()

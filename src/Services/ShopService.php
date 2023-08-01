@@ -201,6 +201,7 @@ class ShopService
         {
             return __('hanoivip.shop::item.code-duplicated');
         }
+        // stick to database data?
         $item = new ShopItem();
         $item->shop_id = $shop->id;
         $item->title = $data['title'];
@@ -221,7 +222,31 @@ class ShopService
         $item->images = json_encode($images);
         $item->description = $data['description'];
         $item->delivery_type = $data['delivery_type'];
+        $item->meta = $data['meta'];
         $item->save();
+        return true;
+    }
+    
+    public function removeShopItem($slug, $code)
+    {
+        $items = $this->shopData->getShopItems($slug, $code);
+        if ($items instanceof \Illuminate\Database\Eloquent\Collection) 
+        {
+            if ($items->isNotEmpty())
+            {
+                foreach ($items as $item)
+                {
+                    $item->delete();
+                }
+            }
+        }
+        else
+        {
+            if (!empty($items))
+            {
+                $items->delete();
+            }
+        }
         return true;
     }
 }

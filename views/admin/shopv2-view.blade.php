@@ -12,16 +12,18 @@
 	<li>
 		<div>
 			<div>
-			Name: {{$item->title}} </br>
-			Origin price: {{$item->origin_price}} </br>
-			Price: {{$item->price}}
-			<input type="hidden" name="shop" value="{{$item->shop->slug}}"/>
-			<input type="hidden" name="item" value="{{$item->code}}"/>
-			<input type="hidden" name="count" value="1"/>
+    			Name: {{$item->title}} </br>
+    			Origin price: {{$item->origin_price}} </br>
+    			Price: {{$item->price}} </br>
+    			<input type="hidden" name="shop" value="{{$item->shop->slug}}"/>
+    			<input type="hidden" name="item" value="{{$item->code}}"/>
+    			<input type="hidden" name="count" value="1"/>
 				@foreach ($item->images as $image)
 					<img src="{{$image}}" title="{{$item->title}}" style="width:128px; height: 64px;"/>
 				@endforeach
 			</div>
+			<br/>
+			<a href="{{ route('ecmin.shopv2.remitem', ['code' => $item->code, 'slug' => $item->shop->slug ]) }}">Del</a>
 		</div>
 	</li>
 @endforeach

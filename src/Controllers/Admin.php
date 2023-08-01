@@ -254,4 +254,32 @@ class Admin extends Controller
             Log::error("ShopV2 admin list shop exception: " . $ex->getMessage());
         }
     }
+    
+    public function removeItem(Request $request)
+    {
+        $slug = $request->input('slug');
+        $code = $request->input('code');
+        $message = null;
+        $error_message = null;
+        try
+        {
+            $result = $this->shopBusiness->removeShopItem($slug, $code);
+            if ($result)
+            {
+                $message = "success";
+            }
+            else
+            {
+                $error_message = "failure";
+            }
+        }
+        catch (Exception $ex)
+        {
+            Log::error("ShopV2 admin remove shop item exception: " . $ex->getMessage());
+        }
+        return view('hanoivip::admin.result', [
+            'message' => $message,
+            'error_message' => $error_message,
+        ]);
+    }
 }
