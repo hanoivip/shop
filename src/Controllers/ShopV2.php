@@ -89,6 +89,29 @@ class ShopV2 extends Controller
         ]); 
     }
     
+    public function viewItem(Request $request)
+    {
+        $shop = $request->input('shop');//slug
+        $code = $request->input('code');
+        $message = null;
+        $error_message = null;
+        $item = null;
+        try 
+        {
+            $item = $this->shopBusiness->getShopItems($shop, $code);
+        }
+        catch (Exception $ex)
+        {
+            Log::error("ShopV2 view item detail exception: " . $ex->getMessage());
+            $error_message = __('hanoivip.shop::item.view.error');
+        }
+        return view('hanoivip::shopv2-item-view', [
+            'item' => $item,
+            'message' => $message,
+            'error_message' => $error_message,
+        ]); 
+    }
+    
     public function addToCart(Request $request)
     {
         $shop = $request->input('shop');
