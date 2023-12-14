@@ -2,6 +2,8 @@
 
 namespace Hanoivip\Shop\Services;
 
+use Hanoivip\Shop\ViewObjects\CartVO;
+
 interface ICartService
 {
     /**

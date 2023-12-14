@@ -1,6 +1,8 @@
 <?php
 
 namespace Hanoivip\Shop\Services;
+
+use Hanoivip\Shop\ViewObjects\ShopVO;
 /**
  * 
  * @author gameo

@@ -11,6 +11,7 @@ use Hanoivip\Shop\Jobs\SendShopOrderJob;
 use Illuminate\Support\Facades\Notification;
 use Hanoivip\User\Facades\UserFacade;
 use Hanoivip\Shop\Notifications\NewOrder;
+use Exception;
 
 class Admin extends Controller
 {

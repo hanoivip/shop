@@ -9,6 +9,7 @@ use Hanoivip\Shop\Services\OrderService;
 use Hanoivip\Shop\Services\ShopService;
 use Hanoivip\Shop\Services\ReceiptService;
 use Hanoivip\PaymentContract\Facades\PaymentFacade;
+use Exception;
 
 class ShopV2 extends Controller
 {
@@ -138,7 +139,8 @@ class ShopV2 extends Controller
             Log::error("ShopV2 add to cart exception: " . $ex->getMessage());
             $error_message = __('hanoivip.shop::cart.add.error');
         }
-        return view('hanoivip::shopv2-view', [
+        $view = view()->exists("hanoivip::shopv2-$shop-view") ? "hanoivip::shopv2-$shop-view" : "hanoivip::shopv2-view";
+        return view($view, [
             'items' => $items,
             'message' => $message,
             'error_message' => $error_message,

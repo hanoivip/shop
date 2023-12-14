@@ -60,4 +60,8 @@ class PhpArrayShop implements IShopData
         return null;
     }
     
+    public function newShop($shop)
+    {}
+
+    
 }

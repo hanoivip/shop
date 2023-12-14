@@ -8,11 +8,18 @@
 			"options" : {
 					"symlink" : true
 			}
+		}, {
+			"type" : "path",
+			"url" : "../vip",
+			"options" : {
+					"symlink" : true
+			}
 		}
 	],	
 	"require" : {
 		"php" : ">=7.0.0",
-		"hanoivip/events": "dev-master"
+		"hanoivip/events": "dev-master",
+		"hanoivip/vip": "dev-master"
 	},
 	"autoload" : {
 		"psr-4" : {

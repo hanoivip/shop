@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Hanoivip\User\Facades\UserFacade;
 use Illuminate\Support\Facades\Notification;
 use Hanoivip\Shop\Notifications\NewOrder;
+use Exception;
 
 class OrderService
 {   
