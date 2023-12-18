@@ -296,7 +296,7 @@ class ShopV2 extends Controller
         $error_message = null;
         try
         {
-            return PaymentFacade::pay($order, 'shopv2.pay.callback', $client);
+            return PaymentFacade::pay($order, 'newrecharge.done', $client); //  'shopv2.pay.callback'
         }
         catch (Exception $ex)
         {

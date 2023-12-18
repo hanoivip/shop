@@ -2,6 +2,7 @@
 namespace Hanoivip\Shop\ViewObjects;
 
 use Illuminate\Support\Str;
+use Exception;
 
 class CartVO
 {
