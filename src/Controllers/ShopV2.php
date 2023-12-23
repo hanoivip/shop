@@ -10,6 +10,7 @@ use Hanoivip\Shop\Services\ShopService;
 use Hanoivip\Shop\Services\ReceiptService;
 use Hanoivip\PaymentContract\Facades\PaymentFacade;
 use Exception;
+use Hanoivip\Shop\Jobs\CheckPendingReceipt;
 
 class ShopV2 extends Controller
 {
@@ -296,7 +297,7 @@ class ShopV2 extends Controller
         $error_message = null;
         try
         {
-            return PaymentFacade::pay($order, 'newrecharge.done', $client); //  'shopv2.pay.callback'
+            return PaymentFacade::pay($order, 'shopv2.pay.callback', $client); //  
         }
         catch (Exception $ex)
         {
@@ -311,21 +312,45 @@ class ShopV2 extends Controller
     
     public function payCallback(Request $request)
     {
+        $userId = Auth::user()->getAuthIdentifier();
         $order = $request->input('order');
         $receipt = $request->input('receipt');
         $message = null;
         $error_message = null;
+        $notice_message = null;
         try
         {
-            $result = $this->shopBusiness->onPayDone($order, $receipt);
-            if ($result === true)
+            $result = $this->receiptBusiness->check($userId, $order, $receipt);
+            if (gettype($result) === 'boolean')
             {
-                $message = __('hanoivip.shop::pay.success');
+                if ($result === true)
+                {
+                    $message = __('hanoivip.shop::pay.success-done');
+                }
+                else
+                {
+                    $error_message = __('hanoivip.shop::pay.failure-done');
+                }
             }
-            else
+            else 
             {
-                $error_message = $result;
-            }
+                /** @var \Hanoivip\PaymentMethodContract\IPaymentResult $result */
+                if ($result->isFailure())
+                {
+                    $error_message = __('hanoivip.shop::pay.failure');
+                }
+                else if ($result->isPending())
+                {
+                    $notice_message = __('hanoivip.shop::pay.pending');
+                    dispatch(new CheckPendingReceipt($userId, $order, $receipt));
+                    return $this->receiptBusiness->openPendingPage($receipt);
+                }
+                else if ($result->isSuccess())
+                {
+                    $this->shopBusiness->onPayDone($order, $receipt);
+                    $message = __('hanoivip.shop::pay.success');
+                }
+            }            
         }
         catch (Exception $ex)
         {
@@ -334,6 +359,7 @@ class ShopV2 extends Controller
         }
         return view('hanoivip::shopv2-pay-result', [
             'message' => $message,
+            'notice_message' => $notice_message,
             'error_message' => $error_message,
         ]);
     }
