@@ -7,6 +7,13 @@ use Hanoivip\PaymentMethodContract\IPaymentResult;
 
 class ReceiptService
 {
+    private $orders;
+    
+    public function __construct(OrderService $orders)
+    {
+        $this->orders = $orders;
+    }
+    
     /**
      * 
      * @param number $userId
@@ -16,7 +23,26 @@ class ReceiptService
      */
     public function check($userId, $order, $receipt)
     {
-        return PaymentFacade::query($receipt);
+        $record = $this->orders->detail($order);
+        if ($record->payment_status == OrderService::PAID)
+        {
+            return true;
+        }
+        else if ($record->payment_status == OrderService::ERROR)
+        {
+            return false;
+        }
+        /** @var IPaymentResult $result */
+        $result = PaymentFacade::query($receipt);
+        if ($result->isFailure())
+        {
+            $this->orders->onPayError($record);
+        }
+        else if ($result->isSuccess())
+        {
+            //
+        }
+        return $result;
     }
     
     public function openPendingPage($receipt)

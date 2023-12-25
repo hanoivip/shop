@@ -11,7 +11,6 @@ use Exception;
 use Hanoivip\Shop\ViewObjects\ShopVO;
 use Hanoivip\Shop\Models\ShopItem;
 use Illuminate\Support\Str;
-use Hanoivip\Shop\Jobs\SendShopOrderJob;
 
 class ShopService
 {   
@@ -135,31 +134,6 @@ class ShopService
     public function getShopItems($shop, $items = null, $orderType = null, $order = null)
     { 
         return $this->shopData->getShopItems($shop, $items, $orderType, $order);
-    }
-    
-    public function onPayDone($order, $receipt)
-    {
-        $orderRec = $this->orderService->detail($order);
-        if (empty($orderRec))
-        {
-            return __('hanoivip.shop::order.invalid');
-        }
-        $check = $this->receiptBusiness->check($orderRec->user_id, $order, $receipt);
-        if (empty($check))
-        {
-            return __('hanoivip.shop::receipt.failure');
-        }
-        if ($orderRec->payment_status == OrderService::UNPAID)
-        {
-            $orderRec->payment_status = OrderService::PAID;
-        }
-        if ($orderRec->delivery_status == OrderService::UNSENT)
-        {
-            $orderRec->delivery_status = OrderService::SENDING;
-            dispatch(new SendShopOrderJob($order, "PaymentFlow"));
-        }
-        $orderRec->save();
-        return true;
     }
     
     public function newShop($data)

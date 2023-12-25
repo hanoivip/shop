@@ -1,0 +1,1 @@
+<p>Items are sent. Login game and check out</p>

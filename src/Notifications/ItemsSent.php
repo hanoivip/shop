@@ -6,23 +6,16 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Hanoivip\Shop\ViewObjects\CartVO;
 
-class NewOrder extends Notification implements ShouldQueue
+class ItemsSent extends Notification implements ShouldQueue
 {
     use Queueable;
     
     private $order;
-    /**
-     * 
-     * @var CartVO $cart
-     */
-    private $cart;
     
-    public function __construct($order, $cart)
+    public function __construct($order)
     {
         $this->order = $order;
-        $this->cart = $cart;
     }
     
     public function via($notifiable)
@@ -32,7 +25,7 @@ class NewOrder extends Notification implements ShouldQueue
     
     public function toMail($notifiable)
     {
-        return (new MailMessage)->view('hanoivip::emails.order-new', ['order' => $this->order, 'cart' => $this->cart]);
+        return (new MailMessage)->view('hanoivip::emails.items-sent', ['order' => $this->order]);
     }
     
     public function toArray($notifiable)

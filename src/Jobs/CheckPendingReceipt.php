@@ -14,6 +14,7 @@ use Hanoivip\PaymentContract\Facades\PaymentFacade;
 use Hanoivip\Payment\Facades\BalanceFacade;
 use Hanoivip\Shop\Services\ShopService;
 use Hanoivip\Events\Gate\UserTopup;
+use Hanoivip\Shop\Services\OrderService;
 
 class CheckPendingReceipt implements ShouldQueue
 {
@@ -27,12 +28,12 @@ class CheckPendingReceipt implements ShouldQueue
     private $receipt;
     
     private $order;
-    
-    protected $shopBusiness;
+    /** @var OrderService */
+    protected $orderBusiness;
     
     public function __construct($userId, $order, $receipt)
     {
-        $this->shopBusiness = app()->make(ShopService::class);
+        $this->orderBusiness = app()->make(OrderService::class);
         $this->userId = $userId;
         $this->receipt = $receipt;
         $this->order = $order;
@@ -48,9 +49,9 @@ class CheckPendingReceipt implements ShouldQueue
                 if ($result->isPending())
                 {
                     if ($this->attempts() < 10)
-                        $this->release(120);
+                        $this->release(60);
                     else 
-                        $this->release(600);
+                        $this->release(300);
                 }
                 else if ($result->isFailure())
                 {
@@ -58,7 +59,7 @@ class CheckPendingReceipt implements ShouldQueue
                 }
                 else 
                 {
-                    $this->shopBusiness->onPayDone($this->order, $this->receipt);
+                    $this->orderBusiness->onPayDone($this->order, $this->receipt);
                 }
             }
             else 

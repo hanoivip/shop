@@ -23,17 +23,20 @@ class SendShopOrderJob implements ShouldQueue
     private $order;
     
     private $reason;
+    /** @var OrderService */
+    private $orderService;
     
     public function __construct($order, $reason)
     {
         $this->order = $order;
         $this->reason = $reason;
+        $this->orderService = app()->make(OrderService::class);
     }
     
     public function handle()
     {
         Redis::funnel('SendShopOrderJob@' . $this->order)->limit(1)->then(function () {
-            $record = ShopOrder::where('serial', $this->order)->first();
+            $record = $this->orderService->detail($this->order);
             if (!empty($record))
             {
                 /*if ($record->payment_status == OrderService::UNPAID)
@@ -78,9 +81,7 @@ class SendShopOrderJob implements ShouldQueue
                     }
                     if ($sent)
                     {
-                        $record->delivery_status = OrderService::SENT;
-                        $record->delivery_reason = $this->reason;
-                        $record->save();
+                        $this->orderService->onOrderSent($record, $this->reason);
                     }
                     else
                     {

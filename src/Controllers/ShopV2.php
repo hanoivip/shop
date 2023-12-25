@@ -347,7 +347,7 @@ class ShopV2 extends Controller
                 }
                 else if ($result->isSuccess())
                 {
-                    $this->shopBusiness->onPayDone($order, $receipt);
+                    $this->orderService->onPayDone($order, $receipt);
                     $message = __('hanoivip.shop::pay.success');
                 }
             }            
