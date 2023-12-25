@@ -225,6 +225,22 @@ class ShopV2 extends Controller
         return response()->redirectToRoute('shopv2');
     }
     
+    private function _validate(Request $request)
+    {
+        $svname = $request->input('svname');
+        $roleid = $request->input('roleid');
+        $errors = [];
+        if (empty($svname))
+        {
+            $errors['svname'] = __('hanoivip.shop::order.validate.svname-missing');
+        }
+        if (empty($roleid))
+        {
+            $errors['roleid'] = __('hanoivip.shop::order.validate.roleid-missing');
+        }
+        return $errors;
+    }
+    
     public function order(Request $request)
     {
         $cart = $request->input('cart');
@@ -237,9 +253,13 @@ class ShopV2 extends Controller
             $record = $this->cartBusiness->getDetail($cart);
             if ($record->delivery_type == 1 || $record->delivery_type == 2)
             {
+                $errors = $this->_validate($request);
+                if (!empty($errors))
+                {
+                    return back()->withInput()->withErrors($errors);
+                }
                 $svname = $request->input('svname');
                 $roleid = $request->input('roleid');
-                // TODO: validate ?
                 $info = new \stdClass();
                 $info->svname = $svname;
                 $info->roleid = $roleid;
