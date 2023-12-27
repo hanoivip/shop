@@ -11,6 +11,7 @@ use Hanoivip\Shop\Services\ReceiptService;
 use Hanoivip\PaymentContract\Facades\PaymentFacade;
 use Exception;
 use Hanoivip\Shop\Jobs\CheckPendingReceipt;
+use Hanoivip\Shop\Models\ShopOrder;
 
 class ShopV2 extends Controller
 {
@@ -393,7 +394,9 @@ class ShopV2 extends Controller
         try
         {
             $userId = Auth::user()->getAuthIdentifier();
-            $records = $this->orderService->list($userId, $page);
+            $records = ShopOrder::where('user_id', $userId)
+            ->orderBy('id', 'desc')
+            ->paginate(10);
         }
         catch (Exception $ex)
         {

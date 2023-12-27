@@ -1,4 +1,4 @@
-@extends('hanoivip::layouts.app-test')
+@extends('hanoivip::layouts.app')
 
 @section('title', 'Web shop history')
 
@@ -25,16 +25,17 @@ table, th, td {
 		<td>{{ $record->serial }}</td>
 		<td>{{ $record->price }} {{ $record->currency }}</td>
 		<td>{{ __('hanoivip.shop::order.payment_status.' . $record->payment_status) }}
-		@if ($record->payment_status == 0)
-			<a href="{{ route('shopv2.pay', ['order' => $record->serial ]) }}">Pay</a>
-		@endif
 		</td>
 		<td>{{ __('hanoivip.shop::order.delivery_status.' . $record->delivery_status) }}</td>
 		<td>
-			<a href="">Detail</a>
+			@if ($record->payment_status == 0)
+    			<a href="{{ route('shopv2.pay', ['order' => $record->serial ]) }}">Pay</a>
+    		@endif
 		</td>
 	</tr>
 @endforeach 
 </table>
+
+{{ $records->links() }}
 
 @endsection
