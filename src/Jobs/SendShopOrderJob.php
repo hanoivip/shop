@@ -79,7 +79,7 @@ class SendShopOrderJob implements ShouldQueue
                             $sent = $sent && GameHelper::transferAccount($item->code, $cart->userId);
                             break;
                     }
-                    if ($sent)
+                    if ($sent === true)
                     {
                         $this->orderService->onOrderSent($record, $this->reason);
                     }
