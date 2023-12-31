@@ -1,9 +1,10 @@
 <?php
 namespace Hanoivip\Shop\Controllers;
 
+use Hanoivip\Shop\Services\ShopService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Request;
 use Exception;
 /**
  * IAP module migration
@@ -14,6 +15,14 @@ use Exception;
  */
 class Iap extends Controller
 {
+    protected $shopBusiness;
+    
+    public function __construct(
+        ShopService $shopBusiness)
+    {
+        $this->shopBusiness = $shopBusiness;
+    }
+    
     public function getItems(Request $request)
     {
         $shop = $request->input('client');//= shop slug
