@@ -84,6 +84,11 @@ class ShopV2 extends Controller
             Log::error("ShopV2 open shop exception: " . $ex->getMessage());
             $error_message = __('hanoivip.shop::open.error');
         }
+        if ($request->ajax())
+        {
+            return ['error' => empty($error_message) ? 0 : 1, 'message' => empty($error_message) ? $message : $error_message, 
+                'data' => ['items' => $items]];
+        }
         return view($view, [
             'shop' => $shop,
             'items' => $items,
