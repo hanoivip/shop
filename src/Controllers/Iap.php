@@ -35,6 +35,19 @@ class Iap extends Controller
             if ($this->shopBusiness->canOpen($userId, $shop))
             {
                 $items = $this->shopBusiness->getShopItems($shop, null, null, null);
+                // convert to old iap record
+                $newItems = [];
+                foreach ($items as $item)
+                {
+                    $newItems[] = [
+                        'merchant_id' => $item->code,
+                        'disable' => 0,
+                        'merchant_title' => $item->title,
+                        'merchant_image' => $item->images[0],
+                        'price' => $item->price,
+                        'currency' => $item->currency,
+                    ];
+                }
             }
             else
             {
@@ -47,6 +60,6 @@ class Iap extends Controller
             $error_message = __('hanoivip.shop::open.error');
         }
         return ['error' => empty($error_message) ? 0 : 1, 'message' => empty($error_message) ? $message : $error_message,
-            'data' => ['items' => $items]];
+            'data' => ['items' => $newItems]];
     }
 }
