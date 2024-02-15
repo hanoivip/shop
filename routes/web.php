@@ -45,6 +45,7 @@ Route::middleware([
         Route::get('/list/shop', 'Admin@listShop')->name('ecmin.shopv2');
         Route::get('/view/shop', 'Admin@viewShop')->name('ecmin.shopv2.open');
         Route::get('/list/order', 'Admin@listOrder')->name('ecmin.shopv2.order');
+        Route::any('/find/order', 'Admin@findOrder')->name('ecmin.shopv2.order.find');
         Route::any('/view/order', 'Admin@viewOrder')->name('ecmin.shopv2.order.view');
         Route::any('/view/order/finish', 'Admin@finishOrder')->name('ecmin.shopv2.order.finish');
         Route::any('/view/order/email', 'Admin@emailOrder')->name('ecmin.shopv2.order.email');

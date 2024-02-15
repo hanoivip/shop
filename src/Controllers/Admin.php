@@ -3,6 +3,7 @@ namespace Hanoivip\Shop\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Hanoivip\Shop\Services\IShopData;
 use Hanoivip\Shop\Services\ShopService;
@@ -71,6 +72,7 @@ class Admin extends Controller
         ]); 
     }
     
+    // list order by user
     public function listOrder(Request $request)
     {
         $message = null;
@@ -88,6 +90,31 @@ class Admin extends Controller
             $error_message = __('hanoivip.shop::order.list.error');
         }
         return view('hanoivip::admin.shopv2-order-list', [
+            'orders' => $records,
+            'message' => $message,
+            'error_message' => $error_message,
+        ]);
+    }
+    
+    public function findOrder(Request $request)
+    {
+        $message = null;
+        $error_message = null;
+        $records = null;
+        try 
+        {
+            $query = DB::table("shop_orders");
+            if ($request->getMethod() == 'POST')
+            {
+                $order = $request->input('order');
+                $query = $query->where('serial', $order);
+            }
+            $records = $query->orderBy('id', 'desc')->paginate(15);
+        } catch (Exception $ex) {
+            Log::error("ShopV2 find order exception: " . $ex->getMessage());
+            $error_message = __('hanoivip.shop::order.find.error');
+        }
+        return view('hanoivip::admin.shopv2-order-find', [
             'orders' => $records,
             'message' => $message,
             'error_message' => $error_message,
