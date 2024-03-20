@@ -11,5 +11,9 @@ return [
     'send-item-fail' => 'Mua vật phẩm không thành công (gửi vật phẩm lỗi). Mời thử lại trước khi liên hệ hỗ trợ.',
     'pay' => [
         'success' => 'Thanh toán thành công, bạn sẽ nhận được đồ ngay lập tức',
-    ]
+    ],
+    'open' => [
+        'forbidden' => 'Bạn không đủ điều kiện để mở shop này.',
+        'error' => 'Thao tác thất bại. Mời thử lại sau.',
+    ],
 ];

@@ -5,5 +5,6 @@ return [
     'pending' => 'Thanh toán cần thêm chút thời gian/thao tác để hoàn thành!',
     'failure' => 'Thanh toán thất bại. Hãy thử lại.',
     'success-done' => 'Thanh toán đã thành công! Giao dịch đã hoàn tất.',
-    'failure-done' => 'Giao dịch đã thất bại. Mời thực hiện lại giao dịch mới'
+    'failure-done' => 'Giao dịch đã thất bại. Mời thực hiện lại giao dịch mới',
+    'error' => 'Thanh toán thất bại. Mời thử lại.',
 ];

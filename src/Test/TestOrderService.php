@@ -17,22 +17,12 @@ class TestOrderService
     const SENDING = 1;
     const SENT = 2;
     const SENDFAIL = 3;
-    /**
-     * 
-     * @param CartVO $cart
-     * @return \stdClass
-     */
+    
     private function calculatePrice($cart)
     {
         return 666;
     }
     
-    /**
-     * Order by cart
-     * @param number $userId
-     * @param CartVO $cart
-     * @return ShopOrder
-     */
     public function order($userId, $cart)
     {
         $price = $this->calculatePrice($cart);
@@ -61,7 +51,7 @@ class TestOrderService
         $order->cart = json_encode([]);
         $order->price = 666;
         $order->origin_price = 6666;
-        $order->currency = "USD";
+        $order->currency = "VND";
         $order->payment_status = self::UNPAID;
         $order->delivery_status = self::UNSENT;
         return $order;

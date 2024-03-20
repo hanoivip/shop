@@ -76,13 +76,13 @@ class ShopV2 extends Controller
             }
             else
             {
-                $error_message = __('hanoivip.shop::open.forbidden');
+                $error_message = __('hanoivip.shop::shop.open.forbidden');
             }
         }
         catch (Exception $ex)
         {
             Log::error("ShopV2 open shop exception: " . $ex->getMessage());
-            $error_message = __('hanoivip.shop::open.error');
+            $error_message = __('hanoivip.shop::shop.open.error');
         }
         if ($request->ajax())
         {
