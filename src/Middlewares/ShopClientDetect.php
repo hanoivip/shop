@@ -12,7 +12,7 @@ class ShopClientDetect
     
     public function handle(Request $request, Closure $next)
     {
-        if ($request->hasHeader("mysdk_version"))
+        if ($request->hasHeader("mysdk-version"))
         {
             app()->bind(ICartService::class, GameServiceCart::class);
         }
