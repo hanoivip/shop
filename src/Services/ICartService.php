@@ -17,9 +17,10 @@ interface ICartService
     public function removeFromCart($userId, $itemId);
     /**
      * Get cart by cart ID
-     * @param CartVO $cart
+     * @param string $cartId
+     * @return CartVO
      */
-    public function getDetail($cart);
+    public function getDetail($cartId);
     /**
      * Get cart by user
      * @param number $userId

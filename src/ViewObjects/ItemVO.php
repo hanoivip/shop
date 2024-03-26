@@ -33,4 +33,16 @@ class ItemVO
      * @var number
      */
     public $delivery_type;
+    
+    public function __construct($code, $price, $currency = null, $count = 1)
+    {
+        $this->code = $code;
+        $this->name = $code;
+        $this->description = $code;
+        $this->images = [];
+        $this->origin_price = $price * 5;
+        $this->price = $price;
+        $this->currency = $currency;
+        $this->count = $count;
+    }
 }
