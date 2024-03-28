@@ -1,6 +1,6 @@
 <?php
 
-namespace Hanoivip\User\Middlewares;
+namespace Hanoivip\Shop\Middlewares;
 
 use Hanoivip\Shop\Services\ICartService;
 use Illuminate\Http\Request;
