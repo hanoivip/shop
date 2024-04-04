@@ -62,4 +62,28 @@ class Iap extends Controller
         return ['error' => empty($error_message) ? 0 : 1, 'message' => empty($error_message) ? $message : $error_message,
             'data' => ['items' => $newItems]];
     }
+    
+    public function order(Request $request)
+    {
+        $cart = $request->input('cart');
+        try
+        {
+            $userId = Auth::user()->getAuthIdentifier();
+            $record = $this->cartBusiness->getDetail($cart);
+            $result = $this->orderService->order($userId, $record);
+            if (gettype($result) == 'string')
+            {
+                return ['error' => 1, 'message' => $result];
+            }
+            else
+            {
+                return ['error' => 0, 'message' => __('hanoivip.shop::cart.order.success'), 'data' => ['serial' => $result->serial] ];
+            }
+        }
+        catch (Exception $ex)
+        {
+            Log::error("ShopV2 order exception: " . $ex->getMessage());
+            return ['error' => 99, 'message' => __('hanoivip.shop::cart.order.error')];
+        } 
+    }
 }
