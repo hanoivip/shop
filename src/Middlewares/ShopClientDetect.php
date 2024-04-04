@@ -15,7 +15,7 @@ class ShopClientDetect
     {
         if ($request->hasHeader("mysdk-version"))
         {
-            Log::error("ShopClient detect mysdk client.");
+            //Log::error("ShopClient detect mysdk client.");
             app()->bind(ICartService::class, GameServiceCart::class);
         }
         return $next($request);

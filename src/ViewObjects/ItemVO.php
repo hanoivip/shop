@@ -13,6 +13,8 @@ class ItemVO
     
     public $name;
     
+    public $title;
+    
     public $description;
     
     public $images;
@@ -38,6 +40,7 @@ class ItemVO
     {
         $this->code = $code;
         $this->name = $code;
+        $this->title = $code;
         $this->description = $code;
         $this->images = [];
         $this->origin_price = $price * 5;

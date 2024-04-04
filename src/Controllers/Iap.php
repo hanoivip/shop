@@ -70,7 +70,7 @@ class Iap extends Controller
         }
         catch (Exception $ex)
         {
-            Log::error("ShopV2 open shop exception: " . $ex->getMessage());
+            Log::error("Iap open shop exception: " . $ex->getMessage());
             $error_message = __('hanoivip.shop::open.error');
         }
         return ['error' => empty($error_message) ? 0 : 1, 'message' => empty($error_message) ? $message : $error_message,
@@ -96,7 +96,7 @@ class Iap extends Controller
         }
         catch (Exception $ex)
         {
-            Log::error("ShopV2 order exception: " . $ex->getMessage());
+            Log::error("Iap order exception: " . $ex->getMessage());
             return ['error' => 99, 'message' => __('hanoivip.shop::cart.order.error')];
         } 
     }
