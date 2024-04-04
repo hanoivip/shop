@@ -1,6 +1,8 @@
 <?php
 namespace Hanoivip\Shop\Controllers;
 
+use Hanoivip\Shop\Services\ICartService;
+use Hanoivip\Shop\Services\OrderService;
 use Hanoivip\Shop\Services\ShopService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,12 +17,24 @@ use Exception;
  */
 class Iap extends Controller
 {
+   
+    
     protected $shopBusiness;
     
+    protected $cartBusiness;
+    
+    protected $orderService;
+    
+    protected $receiptBusiness;
+    
     public function __construct(
-        ShopService $shopBusiness)
+        ShopService $shopBusiness,
+        ICartService $cartBusiness,
+        OrderService $orderService)
     {
         $this->shopBusiness = $shopBusiness;
+        $this->cartBusiness = $cartBusiness;
+        $this->orderService = $orderService;
     }
     
     public function getItems(Request $request)
