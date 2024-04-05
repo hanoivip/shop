@@ -44,6 +44,9 @@ class CartVO
         }
         $this->items[] = $item;
     }
-    
+    /**
+     * 
+     * @var \stdClass svname & roleid
+     */
     public $delivery_info = null;
 }
