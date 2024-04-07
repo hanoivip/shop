@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Hanoivip\GameContracts\ViewObjects\UserVO;
 use Hanoivip\Shop\ViewObjects\CartVO;
 use Hanoivip\Shop\ViewObjects\ItemVO;
+use Hanoivip\GameContracts\ViewObjects\ServerVO;
+use Hanoivip\Game\Facades\GameHelper;
 
 /**
  * Cart implement by game service
@@ -38,7 +40,14 @@ class GameServiceCart implements ICartService
     public function getDetail($cartId)
     {
         $user = Auth::user();
-        $order = $this->operator->orderDetail(new UserVO($user->getAuthIdentifier(), $user->getAuthIdentifierName()), $cartId);
+        $serverId = null;
+        if (str_contains($cartId, "@@"))
+        {
+            $i = strstr($cartId, "@@");
+            $serverId = substr($cartId, 0, $i);
+            $cartId = substr($cartId, $i+2);
+        }
+        $order = GameHelper::getOrderDetail($cartId, $serverId);
         // convert into CartVO
         if ($order->uid != $user->getAuthIdentifier())
         {
