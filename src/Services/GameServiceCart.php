@@ -6,10 +6,8 @@ use Exception;
 use Hanoivip\GameContracts\Contracts\IGameOperator;
 use function Illuminate\Foundation\Testing\Concerns\__construct;
 use Illuminate\Support\Facades\Auth;
-use Hanoivip\GameContracts\ViewObjects\UserVO;
 use Hanoivip\Shop\ViewObjects\CartVO;
 use Hanoivip\Shop\ViewObjects\ItemVO;
-use Hanoivip\GameContracts\ViewObjects\ServerVO;
 use Hanoivip\Game\Facades\GameHelper;
 
 /**

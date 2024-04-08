@@ -2,7 +2,6 @@
 
 namespace Hanoivip\Shop\Services;
 
-use Hanoivip\Shop\Services\ICartService;
 use Hanoivip\Shop\ViewObjects\CartVO;
 use Illuminate\Support\Facades\Log;
 use Exception;

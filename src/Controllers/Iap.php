@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use Hanoivip\Shop\Services\PureServiceCart;
+use Hanoivip\Shop\ViewObjects\ItemVO;
 /**
  * IAP module migration
  * TODO: change domain in app client and remove this
@@ -99,5 +101,40 @@ class Iap extends Controller
             Log::error("Iap order exception: " . $ex->getMessage());
             return ['error' => 99, 'message' => __('hanoivip.shop::cart.order.error')];
         } 
+    }
+    
+    public function orderWithDetail(Request $request)
+    {
+        $userId = Auth::user()->getAuthIdentifier();
+        $itemRaw = $request->input('item');
+        $deliveryRaw = $request->input('delivery');
+        try
+        {
+            $itemJson = json_decode($itemRaw);
+            $deliveryInfo = json_decode($deliveryRaw);
+            // build cart here
+            $cartBuilder = new PureServiceCart();
+            $item = new ItemVO($itemJson->code, $itemJson->price, $itemJson->name);
+            $cartBuilder->addToCart($userId, null, $item);
+            //$deliveryInfo = new \stdClass();
+            //$deliveryInfo->svname = $request->input('svname');
+            //$deliveryInfo->roleid = $request->input('roleid');
+            $cartBuilder->setDeliveryInfo(null, $deliveryInfo);
+            $record = $cartBuilder->getDetail();
+            $result = $this->orderService->order($userId, $record);
+            if (gettype($result) == 'string')
+            {
+                return ['error' => 1, 'message' => $result];
+            }
+            else
+            {
+                return ['error' => 0, 'message' => __('hanoivip.shop::cart.order.success'), 'data' => ['serial' => $result->serial] ];
+            }
+        }
+        catch (Exception $ex)
+        {
+            Log::error("Iap order exception: " . $ex->getMessage());
+            return ['error' => 99, 'message' => __('hanoivip.shop::cart.order.error')];
+        }
     }
 }

@@ -8,4 +8,6 @@ Route::middleware('auth:api')->namespace('Hanoivip\Shop\Controllers')
         Route::any('/iap/items', 'Iap@getItems');
         // order by game cart
         Route::any('/iap/order', 'Iap@order');
+        // order by detail submission
+        Route::any('/iap/orderWithDetail', 'Iap@orderWithDetail');
     });
