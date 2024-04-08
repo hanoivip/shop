@@ -47,5 +47,6 @@ class ItemVO
         $this->price = $price;
         $this->currency = $currency;
         $this->count = $count;
+        $this->delivery_type = 1;
     }
 }

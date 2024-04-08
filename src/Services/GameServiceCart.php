@@ -53,7 +53,7 @@ class GameServiceCart implements ICartService
         }
         $cart = new CartVO($order->uid, "gameservice");
         $cart->id = $order->id;
-        $item = new ItemVO($order->item, $order->amount, $order->currency);
+        $item = new ItemVO($order->item, $order->amount, $order->title, $order->currency);
         $item->delivery_type = ItemVO::ROLE_CURRENCIES;
         $cart->appendItem($item);
         // delivery info
