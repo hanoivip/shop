@@ -114,7 +114,7 @@ class Iap extends Controller
             $deliveryInfo = json_decode($deliveryRaw);
             // build cart here
             $cartBuilder = new PureServiceCart($userId);
-            $item = new ItemVO($itemJson->code, $itemJson->price, $itemJson->name);
+            $item = new ItemVO($itemJson->code, $itemJson->price, $itemJson->name, $itemJson->currency);
             $cartBuilder->addToCart($userId, null, $item);
             $cartBuilder->setDeliveryInfo(null, $deliveryInfo);
             $record = $cartBuilder->getDetail(null);
