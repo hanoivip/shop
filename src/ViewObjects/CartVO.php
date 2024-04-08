@@ -3,7 +3,6 @@ namespace Hanoivip\Shop\ViewObjects;
 
 use Illuminate\Support\Str;
 use Exception;
-use Hanoivip\GameContracts\ViewObjects\OrderVO;
 
 class CartVO
 {
