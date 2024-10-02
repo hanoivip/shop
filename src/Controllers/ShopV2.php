@@ -338,7 +338,7 @@ class ShopV2 extends Controller
     
     public function payCallback(Request $request)
     {
-        $userId = Auth::user()->getAuthIdentifier();
+        // $userId = Auth::user()->getAuthIdentifier();
         $order = $request->input('order');
         $receipt = $request->input('receipt');
         $message = null;
@@ -346,6 +346,8 @@ class ShopV2 extends Controller
         $notice_message = null;
         try
         {
+            $orderDetail = $this->orderService->detail($order);
+            $userId = $orderDetail->userId;
             $result = $this->receiptBusiness->check($userId, $order, $receipt);
             if (gettype($result) === 'boolean')
             {
