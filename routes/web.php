@@ -21,7 +21,7 @@ Route::middleware([
     Route::post('/order', 'ShopV2@order')->name('shopv2.order');
     Route::get('/order/{order}', 'ShopV2@viewOrder')->name('shopv2.order.view');
     // Payment
-    Route::get('/pay/{order}', 'ShopV2@pay')->name('shopv2.pay');
+    //Route::get('/pay/{order}', 'ShopV2@pay')->name('shopv2.pay');
     Route::any('/order-drop', 'ShopV2@dropCart')->name('shopv2.cart.drop');
     // History
     Route::get('/history', 'ShopV2@history')->name('shopv2.history');
@@ -32,6 +32,7 @@ Route::middleware([
 ])->namespace('Hanoivip\Shop\Controllers')
     ->prefix('shopv2')
     ->group(function () {
+        Route::get('/pay/{order}', 'ShopV2@pay')->name('shopv2.pay');
         Route::get('/pay-callback', 'ShopV2@payCallback')->name('shopv2.pay.callback');
     });
     
