@@ -347,7 +347,7 @@ class ShopV2 extends Controller
         try
         {
             $orderDetail = $this->orderService->detail($order);
-            $userId = $orderDetail->userId;
+            $userId = $orderDetail->user_id;
             $result = $this->receiptBusiness->check($userId, $order, $receipt);
             if (gettype($result) === 'boolean')
             {
