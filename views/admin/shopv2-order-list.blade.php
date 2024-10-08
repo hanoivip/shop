@@ -12,7 +12,6 @@
       border: 1px solid black;
     }
     </style>
-
     <table>
     	<tr>
     		<th>Time</th>
@@ -41,6 +40,7 @@
     	</tr>
     @endforeach 
     </table>
+    {{ $orders->appends(['tid' => $tid])->links() }}
 @endif
 
 @endsection

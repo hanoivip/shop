@@ -94,9 +94,8 @@ class OrderService
     public function list($userId, $page = 0, $count = 10)
     {
         return ShopOrder::where('user_id', $userId)
-        ->skip($page * $count)
-        ->take($count)
-        ->get();
+        ->orderBy('id', 'desc')
+        ->paginate($count, ['*'], 'page', $page);
     }
     /**
      * 

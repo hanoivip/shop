@@ -90,6 +90,7 @@ class Admin extends Controller
             $error_message = __('hanoivip.shop::order.list.error');
         }
         return view('hanoivip::admin.shopv2-order-list', [
+            'tid' => $tid,
             'orders' => $records,
             'message' => $message,
             'error_message' => $error_message,
