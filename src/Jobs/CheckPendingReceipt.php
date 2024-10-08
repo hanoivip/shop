@@ -7,15 +7,11 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Hanoivip\PaymentMethodContract\IPaymentResult;
 use Hanoivip\PaymentContract\Facades\PaymentFacade;
-use Hanoivip\Payment\Facades\BalanceFacade;
-use Hanoivip\Shop\Services\ShopService;
-use Hanoivip\Events\Gate\UserTopup;
 use Hanoivip\Shop\Services\OrderService;
 
 class CheckPendingReceipt implements ShouldQueue
@@ -47,7 +43,7 @@ class CheckPendingReceipt implements ShouldQueue
         try {
             $lock->block(5);
             // Lock acquired after waiting maximum of 5 seconds...
-            Log::debug("CheckPendingReceipt-shop at payment $this->userId $this->receipt");
+            Log::debug("CheckPendingReceipt at shop $this->userId $this->receipt");
             $result = PaymentFacade::query($this->receipt);
             if ($result instanceof IPaymentResult)
             {
@@ -55,11 +51,11 @@ class CheckPendingReceipt implements ShouldQueue
                 {
                     if ($this->attempts() < 10)
                     {
-                        $this->release(60);
+                        $this->release(30);
                     }
                     else
                     {
-                        $this->release(300);
+                        $this->release(60);
                     }
                 }
                 else if ($result->isFailure())
@@ -74,20 +70,12 @@ class CheckPendingReceipt implements ShouldQueue
             else
             {
                 Log::error("CheckPendingReceipt query transaction $this->receipt error..retry after 10 min");
-                $this->release(600);
+                $this->release(180);
             }
         } catch (LockTimeoutException $e) {
             $this->release(30);
         } finally {
             optional($lock)->release();
         }
-        
-        /* this method make redis dependency on testing environment
-        Redis::funnel('CheckPendingReceipt-shop@' . $this->userId)->limit(1)->then(function () {
-        }, function () {
-            // Could not obtain lock...
-            return $this->release(120);
-        });
-          */  
     }
 }

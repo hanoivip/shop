@@ -3,6 +3,11 @@
 @section('title', 'Web shop items')
 
 @section('content')
+<style>
+table, th, td {
+  border: 1px solid black;
+}
+</style>
 
 <p>Shop slug: {{ $slug }}</p>
 

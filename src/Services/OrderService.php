@@ -149,4 +149,19 @@ class OrderService
         Notification::send($user, new ItemsSent($record->serial));
         return true;
     }
+    
+    public function onFinish($order, $reason = '') {
+        $record = $this->detail($order);
+        if (empty($record))
+        {
+            return __('hanoivip.shop::order.invalid');
+        }
+        $record->payment_status = self::PAID;
+        $record->delivery_status = OrderService::SENT;
+        $record->delivery_reason = $reason;
+        $record->save();
+        $user = UserFacade::getUserCredentials($record->user_id);
+        Notification::send($user, new ItemsSent($record->serial));
+        return true;
+    }
 }
