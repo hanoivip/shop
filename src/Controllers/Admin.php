@@ -6,9 +6,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Hanoivip\Shop\Services\IShopData;
+use Hanoivip\Shop\Services\ReceiptService;
 use Hanoivip\Shop\Services\ShopService;
 use Hanoivip\Shop\Services\OrderService;
 use Hanoivip\Shop\Jobs\SendShopOrderJob;
+use Hanoivip\Shop\Jobs\CheckPendingReceipt;
 use Illuminate\Support\Facades\Notification;
 use Hanoivip\User\Facades\UserFacade;
 use Hanoivip\Shop\Notifications\NewOrder;
@@ -22,19 +24,22 @@ class Admin extends Controller
     
     private $orderService;
     
+    protected $receiptBusiness;
+    
     public function __construct(
         IShopData $shopData,
         ShopService $shopBusiness,
-        OrderService $orderService)
+        OrderService $orderService,
+        ReceiptService $receiptService)
     {
         $this->shopData = $shopData;
         $this->shopBusiness = $shopBusiness;
         $this->orderService = $orderService;
+        $this->receiptBusiness = $receiptService;
     }
     
     public function listShop(Request $request)
     {
-        $userId = Auth::user()->getAuthIdentifier();
         try
         {
             $list = $this->shopData->allShop();
@@ -147,7 +152,74 @@ class Admin extends Controller
             'order' => $orderRec
         ]);
     }
-    
+    /**
+     * Admin manually check order payment and finish it, if ok
+     * Reason:
+     * Pay callback may be lost?
+     * @param Request $request
+     */
+    public function checkOrder(Request $request)
+    {
+        $order = $request->input('order');
+        $receipt = $request->input('receipt');
+        $message = null;
+        $error_message = null;
+        $notice_message = null;
+        try
+        {
+            $orderDetail = $this->orderService->detail($order);
+            $userId = $orderDetail->user_id;
+            $result = $this->receiptBusiness->check($userId, $order, $receipt);
+            if (gettype($result) === 'boolean')
+            {
+                if ($result === true)
+                {
+                    $message = __('hanoivip.shop::pay.success-done');
+                }
+                else
+                {
+                    $error_message = __('hanoivip.shop::pay.failure-done');
+                }
+            }
+            else
+            {
+                /** @var \Hanoivip\PaymentMethodContract\IPaymentResult $result */
+                if ($result->isFailure())
+                {
+                    $error_message = __('hanoivip.shop::pay.failure');
+                }
+                else if ($result->isPending())
+                {
+                    $notice_message = __('hanoivip.shop::pay.pending');
+                    dispatch(new CheckPendingReceipt($userId, $order, $receipt));
+                }
+                else if ($result->isSuccess())
+                {
+                    $this->orderService->onPayDone($order, $receipt);
+                    $message = __('hanoivip.shop::pay.success');
+                }
+            }
+        }
+        catch (Exception $ex)
+        {
+            Log::error("ShopV2 pay callback exception: " . $ex->getMessage());
+            $error_message = __('hanoivip.shop::pay.error');
+        }
+        return view('hanoivip::admin.result', [
+            'message' => $message,
+            'notice_message' => $notice_message,
+            'error_message' => $error_message,
+        ]);
+    }
+    /**
+     * Admin manually send items without checking payment status
+     * NOTICE: dangerous, repeated sent
+     * 
+     * TODO: need to check order payment and send items
+     * 
+     * @param Request $request
+     * @return \Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     */
     public function finishOrder(Request $request)
     {
         $message = null;
@@ -160,7 +232,7 @@ class Admin extends Controller
             {
                 $error_message = __('hanoivip.shop::order.invalid');
             }
-            else
+            else if ($orderRec->delivery_status == OrderService::UNSENT)
             {
                 $orderRec->delivery_status = OrderService::SENDING;
                 $orderRec->save();

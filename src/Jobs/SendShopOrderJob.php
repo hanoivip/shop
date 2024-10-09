@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Hanoivip\Shop\Services\OrderService;
-use Hanoivip\Shop\Models\ShopOrder;
-use Hanoivip\Shop\ViewObjects\CartVO;
 use Hanoivip\Shop\ViewObjects\ItemVO;
 use Hanoivip\Game\Facades\GameHelper;
 

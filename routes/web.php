@@ -50,6 +50,7 @@ Route::middleware([
         Route::any('/view/order', 'Admin@viewOrder')->name('ecmin.shopv2.order.view');
         Route::any('/view/order/finish', 'Admin@finishOrder')->name('ecmin.shopv2.order.finish');
         Route::any('/view/order/email', 'Admin@emailOrder')->name('ecmin.shopv2.order.email');
+        Route::any('/view/order/check', 'Admin@checkOrder')->name('ecmin.shopv2.order.check');
         Route::any('/new/shop', 'Admin@newShop')->name('ecmin.shopv2.add');
         Route::any('/item/new', 'Admin@newItem')->name('ecmin.shopv2.additem');
         Route::any('/item/del', 'Admin@removeItem')->name('ecmin.shopv2.remitem');

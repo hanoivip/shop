@@ -338,7 +338,6 @@ class ShopV2 extends Controller
     
     public function payCallback(Request $request)
     {
-        // $userId = Auth::user()->getAuthIdentifier();
         $order = $request->input('order');
         $receipt = $request->input('receipt');
         $message = null;
