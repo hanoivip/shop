@@ -110,8 +110,8 @@ class OrderService
     
     public function onPayError($record)
     {
-        $record->payment_status = self::ERROR;
-        $record->save();
+        //$record->payment_status = self::ERROR;
+        //$record->save();
     }
     
     public function onPayDone($order, $receipt)

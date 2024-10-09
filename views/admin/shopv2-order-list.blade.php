@@ -32,7 +32,6 @@
     		<td>{{ $order->delivery_reason }}</td>
     		<td>
     			<a href="{{ route('ecmin.shopv2.order.view', ['order' => $order->serial ]) }}" class="btn btn-primary">Detail</a>
-    			<br/>
     			<a href="{{ route('ecmin.shopv2.order.email', ['order' => $order->serial ]) }}" class="btn btn-primary">Email</a>
     			<!--
     			<br/> 
@@ -43,7 +42,7 @@
     				{{ csrf_field() }}
     				<input id="order" name="order" type="hidden" value="{{$order->serial}}"/>
     				Receipt <input id="receipt" name="receipt" required/>
-    				<button type="submit">Check</button>
+    				<button type="submit" class="btn btn-primary">Check</button>
     			</form>
     		</td>
     	</tr>
