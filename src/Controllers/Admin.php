@@ -13,6 +13,7 @@ use Hanoivip\Shop\Jobs\SendShopOrderJob;
 use Hanoivip\Shop\Jobs\CheckPendingReceipt;
 use Illuminate\Support\Facades\Notification;
 use Hanoivip\User\Facades\UserFacade;
+use Hanoivip\Shop\Models\ShopOrder;
 use Hanoivip\Shop\Notifications\NewOrder;
 use Exception;
 
@@ -85,9 +86,19 @@ class Admin extends Controller
         $page = 0;
         $records = [];
         $tid = $request->input('tid');
+        $order = null;
+        if ($request->has('order')) {
+            $order = $request->input('order');
+        }
         try
         {
-            $records = $this->orderService->list($tid, $page);
+            // $records = $this->orderService->list($tid, $page);
+            $query = ShopOrder::where('user_id', $tid)
+            ->orderBy('id', 'desc');
+            if (!empty($order)) {
+                $query = $query->where('serial', $order);
+            }
+            $records = $query->paginate(10, ['*'], 'page', $page);
         }
         catch (Exception $ex)
         {

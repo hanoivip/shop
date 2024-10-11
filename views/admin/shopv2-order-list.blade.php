@@ -7,6 +7,12 @@
 @if (empty($orders))
 	<p>Have no order yet!</p>
 @else
+	<form method="post" action="{{route('ecmin.shopv2.order')}}">
+		{{ csrf_field() }}
+		Order <input id="order" name="order" value="" required/>
+		<input id="tid" name="tid" value="{{$tid}}" type="hidden"/>
+		<button type="submit" class="btn btn-primary">Filter</button>
+	</form>
     <style>
     table, th, td {
       border: 1px solid black;
