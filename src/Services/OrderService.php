@@ -84,9 +84,9 @@ class OrderService
     
     public function dummyOrder($userId) {
         $order = new ShopOrder();
-        $order->serial = "Dumb@"+Str::random(8);
+        $order->serial = "Dumb@".Str::random(8);
         $order->user_id = $userId;
-        $order->cart = json_encode([]);
+        $order->cart = "{}";
         $order->price = 1;
         $order->origin_price = 1;
         $order->currency = "USD";
