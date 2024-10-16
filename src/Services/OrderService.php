@@ -81,6 +81,20 @@ class OrderService
         Notification::send($user, new NewOrder($serial, $cart));
         return $order;
     }
+    
+    public function dummyOrder($userId) {
+        $order = new ShopOrder();
+        $order->serial = "Dumb@"+Str::random(8);
+        $order->user_id = $userId;
+        $order->cart = json_encode([]);
+        $order->price = 1;
+        $order->origin_price = 1;
+        $order->currency = "USD";
+        $order->payment_status = self::UNPAID;
+        $order->delivery_status = self::UNSENT;
+        $order->save();
+        return $order;
+    }
     /**
      * 
      * @param string $order Order serial

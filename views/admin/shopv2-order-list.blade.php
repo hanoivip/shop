@@ -37,8 +37,8 @@
     		<td>{{ __('hanoivip.shop::order.delivery_status.' . $order->delivery_status) }}</td>
     		<td>{{ $order->delivery_reason }}</td>
     		<td>
-    			<a href="{{ route('ecmin.shopv2.order.view', ['order' => $order->serial ]) }}" class="btn btn-primary">Detail</a>
-    			<a href="{{ route('ecmin.shopv2.order.email', ['order' => $order->serial ]) }}" class="btn btn-primary">Email</a>
+    			<a href="{{ route('ecmin.shopv2.order.view', ['order' => $order->serial ]) }}" class="btn btn-secondary">Detail</a>
+    			<a href="{{ route('ecmin.shopv2.order.email', ['order' => $order->serial ]) }}" class="btn btn-secondary">Email</a>
     			<!--
     			<br/> 
     			<a href="{{ route('ecmin.shopv2.order.finish', ['order' => $order->serial ]) }}" class="btn btn-primary">Finish</a>
