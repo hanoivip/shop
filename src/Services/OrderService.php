@@ -170,11 +170,31 @@ class OrderService
             return __('hanoivip.shop::order.invalid');
         }
         $record->payment_status = self::PAID;
-        $record->delivery_status = OrderService::SENT;
+        $record->delivery_status = self::SENT;
         $record->delivery_reason = $reason;
         $record->save();
         $user = UserFacade::getUserCredentials($record->user_id);
         Notification::send($user, new ItemsSent($record->serial));
         return true;
+    }
+    
+    public function isPaid($order) 
+    {
+        $record = $this->detail($order);
+        if (empty($record))
+        {
+            throw new Exception(__('hanoivip.shop::order.invalid'));
+        }
+        return $record->payment_status == self::PAID;
+    }
+    
+    public function isSent($order)
+    {
+        $record = $this->detail($order);
+        if (empty($record))
+        {
+            throw new Exception(__('hanoivip.shop::order.invalid'));
+        }
+        return $record->payment_status == self::SENT;
     }
 }
