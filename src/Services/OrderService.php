@@ -22,6 +22,7 @@ class OrderService
     const SENDING = 1;
     const SENT = 2;
     const SENDFAIL = 3;
+    
     /**
      * 
      * @param CartVO $cart
